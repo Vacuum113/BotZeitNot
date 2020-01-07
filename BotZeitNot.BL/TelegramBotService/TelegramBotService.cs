@@ -35,9 +35,9 @@ namespace BotZeitNot.BL.TelegramBotService
             {
                 Command command = _commandList.GetCommand(update.Message.Text);
 
-                if (command != null) 
+                if (command != null)
                     command.Execute(update.Message, _client);
-                else 
+                else
                     _client.SendTextMessageAsync(update.Message.Chat.Id, "Для просмотра списка команд - отправте сообщение: \"\\help\"");
             }
         }

@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using Telegram.Bot;
-using Telegram.Bot.Types;
 
 namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList
 {

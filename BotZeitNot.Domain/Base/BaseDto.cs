@@ -1,7 +1,4 @@
 ﻿using BotZeitNot.Domain.Interface;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BotZeitNot.Domain.Base
 {

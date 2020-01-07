@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Telegram.Bot;
-using Telegram.Bot.Types;
 
 namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList
 {
@@ -36,14 +34,14 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList
 
         public Command GetCommand(string commandMessage)
         {
-            if(commandMessage.StartsWith("/search "))
+            if (commandMessage.StartsWith("/search "))
             {
                 return Commands.First(c => c.Name == "/search");
             }
 
-            foreach(var item in Commands)
+            foreach (var item in Commands)
             {
-                if(item.Contains(commandMessage))
+                if (item.Contains(commandMessage))
                 {
                     return item;
                 }

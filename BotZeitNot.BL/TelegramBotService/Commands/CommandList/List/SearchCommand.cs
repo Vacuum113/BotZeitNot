@@ -27,7 +27,7 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList.List
 
         public async override void Execute(Message message, TelegramBotClient client)
         {
-            using(IUnitOfWork unitOfWork = _unitOfWorkFactory.Create())
+            using (IUnitOfWork unitOfWork = _unitOfWorkFactory.Create())
             {
                 var searchString = new StringBuilder(message.Text);
                 searchString.Remove(0, 8);

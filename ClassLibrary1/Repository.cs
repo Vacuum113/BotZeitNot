@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 
 namespace BotZeitNot.DAL
 {
-    public class Repository<T, TPrimaryKey> : IRepository<T, TPrimaryKey> 
+    public class Repository<T, TPrimaryKey> : IRepository<T, TPrimaryKey>
         where T : class, IEntity<TPrimaryKey>
     {
         private readonly ApplicationDbContext _context;

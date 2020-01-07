@@ -31,9 +31,9 @@ namespace BotZeitNot.DAL
 
         public virtual void Dispose(bool disposing)
         {
-            if(!this._disposed)
+            if (!this._disposed)
             {
-                if(disposing)
+                if (disposing)
                 {
                     _context.Dispose();
                 }

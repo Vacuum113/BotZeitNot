@@ -27,7 +27,7 @@ namespace BotZeitNot.Api.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post(Update update)
+        public IActionResult TelegramUpdates(Update update)
         {
             _botService.ExecuteCommand(update);
 

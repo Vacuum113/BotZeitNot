@@ -1,6 +1,6 @@
-﻿using BotZeitNot.Domain.Map;
-using BotZeitNot.DAL.Domain.Entity;
+﻿using BotZeitNot.DAL.Domain.Entity;
 using BotZeitNot.Domain.Base;
+using BotZeitNot.Domain.Map;
 
 namespace BotZeitNot.Shared.Dto
 {

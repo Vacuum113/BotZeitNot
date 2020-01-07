@@ -1,5 +1,4 @@
 ﻿using BotZeitNot.Domain.Interface;
-using BotZeitNot.Shared.Dto;
 using Telegram.Bot.Types;
 
 namespace BotZeitNot.BL.TelegramBotService

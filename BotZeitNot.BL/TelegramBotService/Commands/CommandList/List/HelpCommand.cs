@@ -18,8 +18,8 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList.List
         public async override void Execute(Message message, TelegramBotClient client)
         {
             var helpString = new StringBuilder("Все команды бота:\n");
-            
-            foreach(var command in _commandList.Commands)
+
+            foreach (var command in _commandList.Commands)
             {
                 if (command.Name != "/help")
                 {

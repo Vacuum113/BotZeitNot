@@ -25,10 +25,11 @@ namespace BotZeitNot.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var configBot = Configuration.GetSection("BotConfigProps").Get<BotConfigProps>();
 
-            Bot bot = new Bot(Configuration.GetSection("BotConfigProps").Get<BotConfigProps>());
+            Bot bot = new Bot(configBot);
 
-            bot.Run("");
+            bot.Run("" /*+ configBot.Token*/ );
 
             services.AddSingleton(servicesProvider =>
             {
@@ -74,9 +75,16 @@ namespace BotZeitNot.Api
 
             app.UseAuthentication();
 
+            var token = Configuration.GetSection("BotConfigProps").Get<BotConfigProps>().Token;
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapControllerRoute(
+                    "WithToken",
+                    "{controller}/" + token + "{action}",
+                    new { controller = "Update", action = "TelegramUpdates" }
+                    );
             });
         }
     }

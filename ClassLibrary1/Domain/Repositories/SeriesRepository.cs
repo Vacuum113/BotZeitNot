@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace BotZeitNot.DAL.Domain.Repositories
 {
-    public class SeriesRepository : Repository<Series,int>
+    public class SeriesRepository : Repository<Series, int>
     {
 
         public SeriesRepository(ApplicationDbContext context) : base(context)
