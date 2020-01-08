@@ -7,11 +7,6 @@ namespace BotZeitNot.RSS
 {
     public class RSSParserLostFilm
     {
-        public RSSParserLostFilm()
-        {
-
-        }
-
         public List<Tuple<string, string>> ParseNamesAndLinks(XmlReader xmlReader)
         {
             SyndicationFeed feed = SyndicationFeed.Load(xmlReader);

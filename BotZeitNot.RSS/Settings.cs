@@ -2,6 +2,8 @@
 {
     public class Settings
     {
+        public string BotUrl { get; set; }
+
         public string LostFilmRSSLink { get; set; }
 
         public string SocksIP { get; set; }

@@ -2,12 +2,14 @@
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Xml;
 
 namespace BotZeitNot.RSS
 {
     class Program
     {
-        public static IConfiguration Configuration { get; set; }
+        private static IConfiguration Configuration;
 
         static void Main(string[] args)
         {
@@ -17,24 +19,41 @@ namespace BotZeitNot.RSS
 
             var settings = Configuration.GetSection("Settings").Get<Settings>();
 
-            var xmlReader = new RSSLoaderLostFilm(settings.LostFilmRSSLink).LoadFromRSS(settings).Result;
+            XmlReader xmlReader;
+            List<Tuple<string, string>> episodesStrings;
+            List<Episode> listEpisodes;
+            List<Episode> listEpisodesPrev = new List<Episode>();
 
-            var episodes = new RSSParserLostFilm().ParseNamesAndLinks(xmlReader);
-
-            var listEpisodes = new List<Episode>();
-
-            foreach (var item in episodes)
+            while (true)
             {
-                Episode episode;
+                xmlReader = new RSSLoaderLostFilm(settings).LoadFromRSS().Result;
 
-                if (Episode.TryParse(new ParseAlgorithm(), item, out episode))
+                episodesStrings = new RSSParserLostFilm().ParseNamesAndLinks(xmlReader);
+
+                listEpisodes = new List<Episode>();
+
+                foreach (var item in episodesStrings)
                 {
-                    listEpisodes.Add(episode);
+                    Episode episode;
+
+                    if (Episode.TryParse(new ParseAlgorithm(), item, out episode))
+                    {
+                        listEpisodes.Add(episode);
+                    }
                 }
+
+                var exporter = new Exporter(settings);
+
+                while(!exporter.Export(listEpisodes, listEpisodesPrev))
+                {
+                    Thread.Sleep(TimeSpan.FromMinutes(2));
+                }
+
+                listEpisodesPrev = listEpisodes;
+
+                Thread.Sleep(TimeSpan.FromMinutes(7));
+
             }
-
-            Console.ReadKey();
-
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace BotZeitNot.RSS.Model
 {
-    public class Episode
+    public class Episode : IEquatable<Episode>
     {
         public int Number { get; set; }
 
@@ -23,6 +23,15 @@ namespace BotZeitNot.RSS.Model
             episode = epis ?? null;
 
             return episode != null;
+        }
+
+        public virtual bool Equals(Episode episode)
+        {
+            if (episode == null) return false;
+
+            if (!this.Link.Equals(episode.Link)) return false;
+
+            return base.Equals(episode);
         }
     }
 }

@@ -10,15 +10,14 @@ namespace BotZeitNot.RSS
 {
     public class RSSLoaderLostFilm
     {
-        public string LoadingString { get; private set; }
+        private string _loadingString;
 
-        public RSSLoaderLostFilm(string loadingString)
-        {
-            LoadingString = loadingString;
-        }
+        private HttpClientHandler _clientHandler;
 
-        public async Task<XmlReader> LoadFromRSS(Settings settings)
+        public RSSLoaderLostFilm(Settings settings)
         {
+            _loadingString = settings.LostFilmRSSLink;
+
             IWebProxy proxy = new HttpToSocks5Proxy
                 (
                 settings.SocksIP,
@@ -27,15 +26,19 @@ namespace BotZeitNot.RSS
                 settings.SocksPassword
                 );
 
-            var clientHandler = new HttpClientHandler()
+            _clientHandler = new HttpClientHandler()
             {
                 Proxy = proxy
             };
+        }
+
+        public async Task<XmlReader> LoadFromRSS()
+        {
 
             string rssString;
-            using (HttpClient client = new HttpClient(clientHandler, disposeHandler: true))
+            using (HttpClient client = new HttpClient(_clientHandler, disposeHandler: true))
             {
-                var result = await client.GetAsync(LoadingString);
+                var result = await client.GetAsync(_loadingString);
                 var str = await result.Content.ReadAsStringAsync();
                 StringBuilder stringBuilder = new StringBuilder(str);
 
