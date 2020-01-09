@@ -17,7 +17,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{DF3E838B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BotZeitNot.BL.Tests", "BotZeitNot.BL.Tests\BotZeitNot.BL.Tests.csproj", "{E160849A-223A-4F1B-BBDE-49FDC59DA86C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotZeitNot.RSS", "BotZeitNot.RSS\BotZeitNot.RSS.csproj", "{72246F77-81AE-46B5-AC28-3F4E30B9200D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BotZeitNot.RSS", "BotZeitNot.RSS\BotZeitNot.RSS.csproj", "{72246F77-81AE-46B5-AC28-3F4E30B9200D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotZeitNot.RSS.Tests", "BotZeitNot.RSS.Tests\BotZeitNot.RSS.Tests.csproj", "{5F295AF6-BB57-4F22-A1CA-FF943BC8B898}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,12 +55,17 @@ Global
 		{72246F77-81AE-46B5-AC28-3F4E30B9200D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72246F77-81AE-46B5-AC28-3F4E30B9200D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72246F77-81AE-46B5-AC28-3F4E30B9200D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F295AF6-BB57-4F22-A1CA-FF943BC8B898}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F295AF6-BB57-4F22-A1CA-FF943BC8B898}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F295AF6-BB57-4F22-A1CA-FF943BC8B898}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F295AF6-BB57-4F22-A1CA-FF943BC8B898}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E160849A-223A-4F1B-BBDE-49FDC59DA86C} = {DF3E838B-C550-4DE0-935E-7D7C7547E425}
+		{5F295AF6-BB57-4F22-A1CA-FF943BC8B898} = {DF3E838B-C550-4DE0-935E-7D7C7547E425}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5DC0F6E-679E-4B0C-B5B9-E7AC026D0F2C}

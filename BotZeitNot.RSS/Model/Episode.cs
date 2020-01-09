@@ -25,13 +25,25 @@ namespace BotZeitNot.RSS.Model
             return episode != null;
         }
 
-        public virtual bool Equals(Episode episode)
+        public override bool Equals(object obj)
         {
-            if (episode == null) return false;
+            return Equals(obj as Episode);
+        }
 
-            if (!this.Link.Equals(episode.Link)) return false;
+        public bool Equals(Episode episode)
+        {
+            return episode != null &&
+                   Number == episode.Number &&
+                   NumberSeason == episode.NumberSeason &&
+                   TitleRu == episode.TitleRu &&
+                   TitleSeries == episode.TitleSeries &&
+                   Rating == episode.Rating &&
+                   Link == episode.Link;
+        }
 
-            return base.Equals(episode);
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Number, NumberSeason, TitleRu, TitleSeries, Rating, Link);
         }
     }
 }

@@ -31,8 +31,6 @@ namespace BotZeitNot.RSS
             }
         }
 
-        private HttpClient _httpClient;
-
         private string _botUrl;
 
         private HttpClientHandler _clientHandler;
