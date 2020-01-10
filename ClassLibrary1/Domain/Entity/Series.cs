@@ -13,7 +13,7 @@ namespace BotZeitNot.DAL.Domain.Entity
 
         public string Link { get; set; }
 
-        public bool? IsCompleted { get; set; }
+        public bool IsCompleted { get; set; }
 
         public ICollection<SeriesUser> SeriesUser { get; set; }
 

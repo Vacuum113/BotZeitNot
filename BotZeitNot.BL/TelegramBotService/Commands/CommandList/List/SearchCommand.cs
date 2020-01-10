@@ -19,10 +19,7 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList.List
         {
             _unitOfWorkFactory = unitOfWorkFactory;
 
-            using (IUnitOfWork unitOfWork = unitOfWorkFactory.Create())
-            {
-                _seriesRepository = unitOfWork.GetRepository<Series, int>() as SeriesRepository;
-            }
+            _seriesRepository = unitOfWorkFactory.Create().GetRepository<Series, int>() as SeriesRepository;
         }
 
         public async override void Execute(Message message, TelegramBotClient client)

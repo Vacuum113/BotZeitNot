@@ -10,9 +10,9 @@ namespace BotZeitNot.DAL.Domain.Entity
 
         public string TitleEu { get; set; }
 
-        public string Rating { get; set; }
-
         public string Link { get; set; }
+
+        public string Rating { get; set; }
 
         public int SeasonId { get; set; }
 

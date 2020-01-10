@@ -26,7 +26,6 @@ namespace BotZeitNot.DAL
             base.OnModelCreating(modelBuilder);
         }
 
-
         public DbSet<User> Users { get; set; }
 
         public DbSet<Series> Series { get; set; }
