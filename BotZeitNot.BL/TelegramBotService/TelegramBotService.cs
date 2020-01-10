@@ -24,7 +24,7 @@ namespace BotZeitNot.BL.TelegramBotService
             _client = bot.Get();
         }
 
-        public void ExecuteCommand(Update update)
+        public async void ExecuteCommand(Update update)
         {
             if (
                 update.Message.Text.StartsWith('/') &&
@@ -38,7 +38,13 @@ namespace BotZeitNot.BL.TelegramBotService
                 if (command != null)
                     command.Execute(update.Message, _client);
                 else
-                    _client.SendTextMessageAsync(update.Message.Chat.Id, "Для просмотра списка команд - отправте сообщение: \"\\help\"");
+                    await _client.SendTextMessageAsync(update.Message.Chat.Id,
+                        $"Для просмотра списка команд - отправте сообщение: \"/help\"\n или напишите \"/\" для просмотра доступных команд.");
+            }
+            else
+            {
+                await _client.SendTextMessageAsync(update.Message.Chat.Id, "Извините, не понял вас.\n" +
+                    $"Для просмотра списка команд - отправте сообщение: \"/help\"\n или напишите \"/\" для просмотра доступных команд.");
             }
         }
     }
