@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using Telegram.Bot;
 using Message = Telegram.Bot.Types.Message;
 
@@ -8,9 +9,9 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList.List
     {
         public override string Name => "/help";
 
-        private readonly ICommandList _commandList;
+        private readonly List<Command> _commandList;
 
-        public HelpCommand(ICommandList commandList)
+        public HelpCommand(List<Command> commandList)
         {
             _commandList = commandList;
         }
@@ -19,7 +20,7 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList.List
         {
             var helpString = new StringBuilder("Все команды бота:\n");
 
-            foreach (var command in _commandList.Commands)
+            foreach (var command in _commandList)
             {
                 if (command.Name != "/help")
                 {

@@ -43,6 +43,16 @@ namespace BotZeitNot.BL.Tests
         }
 
         [TestMethod]
+        public void CommandList_HelpCommand()
+        {
+            var commandList = new CommandList(_mockIUnitOfWorkFactory.Object);
+
+            Command command = commandList.GetCommand("/help");
+
+            Assert.AreEqual("/help", command.Name);
+        }
+
+        [TestMethod]
         public void CommandList_Wrong_CommandParam()
         {
             var commandList = new CommandList(_mockIUnitOfWorkFactory.Object);

@@ -22,12 +22,17 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList
 
             foreach (Type type in typelist)
             {
-                if (type.IsClass)
+                if (type.IsClass && type.Name != "HelpCommand")
                 {
                     var com = Activator.CreateInstance(Type.GetType(type.FullName), unitOfWorkFactory);
                     Set(com as Command);
                 }
             }
+
+            var typeHelp = typelist.First(t => t.IsClass && t.Name == "HelpCommand");
+            var comHelp = Activator.CreateInstance(Type.GetType(typeHelp.FullName), Commands);
+            Set(comHelp as Command);
+
         }
 
         public void Set(Command command) => Commands.Add(command);
