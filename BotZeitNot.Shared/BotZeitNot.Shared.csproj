@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BotZeitNot.Domain\BotZeitNot.Domain.csproj" />
-    <ProjectReference Include="..\ClassLibrary1\BotZeitNot.DAL.csproj" />
+    <ProjectReference Include="..\BotZeitNot.DAL\BotZeitNot.DAL.csproj" />
   </ItemGroup>
 
 </Project>
