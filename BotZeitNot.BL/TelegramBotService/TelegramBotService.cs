@@ -58,33 +58,59 @@ namespace BotZeitNot.BL.TelegramBotService
                 if (command != null)
                     command.Execute(update.Message, _client);
                 else
-                    await _client.SendTextMessageAsync(update.Message.Chat.Id,
-                        "Для просмотра списка команд - отправте сообщение: \"/help\"\n или напишите \"/\" для просмотра доступных команд.");
+                {
+                    var helpString = "Для просмотра списка команд " +
+                                     "- отправте сообщение: \"/help\"\n " +
+                                     "или напишите \"/\" для " +
+                                     "просмотра доступных команд.";
+
+                    await _client.SendTextMessageAsync(update.Message.Chat.Id, helpString);
+                }
             }
         }
 
         public async void IfCAllbackQuery(Update update)
         {
-            if (update.CallbackQuery != null &&
+            if (
+                update.CallbackQuery != null &&
                 !update.CallbackQuery.From.IsBot &&
-                update.CallbackQuery.Message != null)
+                update.CallbackQuery.Message != null
+                )
             {
-                if(update.CallbackQuery.Data.Contains("Search"))
+                if (update.CallbackQuery.Data.Contains("Search"))
                 {
                     await _client.AnswerCallbackQueryAsync
                         (
                         update.CallbackQuery.Id
                         );
-                    await _client.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, update.CallbackQuery.From.FirstName + ", Вы подписались на новые серии: " + update.CallbackQuery.Data.Split("/")[1]);
-                    await _client.DeleteMessageAsync(update.CallbackQuery.Message.Chat.Id, update.CallbackQuery.Message.MessageId);
+
+                    var newSeriesMessage = update.CallbackQuery.From.FirstName +
+                        ", Вы подписались на новые серии: "
+                        + update.CallbackQuery.Data.Split("/")[1];
+
+                    await _client.SendTextMessageAsync
+                        (
+                        update.CallbackQuery.Message.Chat.Id,
+                        newSeriesMessage
+                        );
+
+                    await _client.DeleteMessageAsync
+                        (
+                        update.CallbackQuery.Message.Chat.Id,
+                        update.CallbackQuery.Message.MessageId
+                        );
                 }
             }
         }
 
         public async void Default(Update update)
         {
-            await _client.SendTextMessageAsync(update.Message.Chat.Id, "Извините, не понял вас.\n" +
-                "Для просмотра списка команд - отправте сообщение: \"/help\"\n или напишите \"/\" для просмотра доступных команд.");
+            var defaultString = "Извините, не понял вас.\n" +
+                                "Для просмотра списка команд - " +
+                                "отправте сообщение: \"/help\"\n " +
+                                "или напишите \"/\" для просмотра доступных команд.";
+
+            await _client.SendTextMessageAsync(update.Message.Chat.Id, defaultString);
         }
 
     }
