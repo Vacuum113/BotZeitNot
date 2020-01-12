@@ -8,7 +8,7 @@ namespace BotZeitNot.DAL.Domain.Entity
 
         public string TitleRu { get; set; }
 
-        public string TitleEu { get; set; }
+        public string TitleEn { get; set; }
 
         public string Link { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using BotZeitNot.Domain.Interface;
+﻿using BotZeitNot.DAL.Domain.Repositories;
+using BotZeitNot.Domain.Interface;
 using System;
 
 namespace BotZeitNot.DAL
@@ -7,12 +8,58 @@ namespace BotZeitNot.DAL
     {
         private readonly ApplicationDbContext _context;
 
+        private UserRepository _userRepository;
+        private SeriesRepository _seriesRepository;
+        private SeasonRepository _seasonRepository;
+        private EpisodeRepository _episodeRepository;
+
         private bool _disposed;
 
         public UnitOfWork(ApplicationDbContext context)
         {
             _context = context;
         }
+
+        public UserRepository Users {
+            get {
+                if (_userRepository == null)
+                {
+                    _userRepository = new UserRepository(_context);
+                }
+                return _userRepository;
+            }
+        }
+
+        public SeriesRepository Series {
+            get {
+                if (_seriesRepository == null)
+                {
+                    _seriesRepository = new SeriesRepository(_context);
+                }
+                return _seriesRepository;
+            }
+        }
+
+        public SeasonRepository Seasons {
+            get {
+                if (_seasonRepository == null)
+                {
+                    _seasonRepository = new SeasonRepository(_context);
+                }
+                return _seasonRepository;
+            }
+        }
+
+        public EpisodeRepository Episodes {
+            get {
+                if (_episodeRepository == null)
+                {
+                    _episodeRepository = new EpisodeRepository(_context);
+                }
+                return _episodeRepository;
+            }
+        }
+
 
         public IRepository<T, TPrimaryKey> GetRepository<T, TPrimaryKey>() where T : class, IEntity<TPrimaryKey>
         {

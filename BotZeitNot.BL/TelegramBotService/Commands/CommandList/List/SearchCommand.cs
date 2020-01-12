@@ -1,9 +1,12 @@
-﻿using BotZeitNot.DAL.Domain.Entity;
+﻿using BotZeitNot.DAL;
+using BotZeitNot.DAL.Domain.Entity;
 using BotZeitNot.DAL.Domain.Repositories;
 using BotZeitNot.Domain.Interface;
+using System.Collections.Generic;
 using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList.List
 {
@@ -19,20 +22,41 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList.List
         {
             _unitOfWorkFactory = unitOfWorkFactory;
 
-            _seriesRepository = unitOfWorkFactory.Create().GetRepository<Series, int>() as SeriesRepository;
+            _seriesRepository = ((UnitOfWork)unitOfWorkFactory.Create()).Series;
         }
 
         public async override void Execute(Message message, TelegramBotClient client)
         {
-            using (IUnitOfWork unitOfWork = _unitOfWorkFactory.Create())
+            if(message.Text.Length < 8)
             {
-                var searchString = new StringBuilder(message.Text);
-                searchString.Remove(0, 8);
-
-                var seriesName = _seriesRepository.GetByNameSeries(searchString.ToString());
-
-                await client.SendTextMessageAsync(message.Chat.Id, seriesName);
+                return;
             }
+
+            string text = message.Text.Remove(0, 8).TrimStart();
+
+            if(text == "")
+            {
+                return;
+            }
+
+            IEnumerable<Series> series = _seriesRepository.GetByNameAllMatchSeries(text);
+            List<InlineKeyboardButton> buttons = new List<InlineKeyboardButton>();
+
+            foreach (var item in series)
+            {
+                InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton()
+                {
+                    Text = item.NameRu,
+                    CallbackData = "Search/" + item.NameRu
+                };
+                buttons.Add(inlineKeyboardButton);
+            }
+
+            await client.SendTextMessageAsync(
+                chatId: message.Chat.Id,
+                text: "Найденые сериалы: ",
+                replyMarkup: new InlineKeyboardMarkup(buttons)
+                );
         }
     }
 }

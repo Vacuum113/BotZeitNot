@@ -1,4 +1,5 @@
-﻿using BotZeitNot.DAL.Domain.Entity;
+﻿using BotZeitNot.DAL;
+using BotZeitNot.DAL.Domain.Entity;
 using BotZeitNot.DAL.Domain.Repositories;
 using BotZeitNot.Domain.Interface;
 using Telegram.Bot;
@@ -18,24 +19,30 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList.List
         public StartCommand(IUnitOfWorkFactory unitOfWorkFactory)
         {
             _unitOfWorkFactory = unitOfWorkFactory;
-            _userRepository = unitOfWorkFactory.Create().GetRepository<User, int>() as UserRepository;
+            _userRepository = ((UnitOfWork)unitOfWorkFactory.Create()).Users;
         }
 
         public async override void Execute(Message message, TelegramBotClient client)
         {
             using (IUnitOfWork unitOfWork = _unitOfWorkFactory.Create())
             {
+                if(_userRepository.GetByTelegramId(message.From.Id))
+                {
+                    return;
+                }
+
                 _userRepository.Add(new User
                 {
                     TelegramId = message.From.Id,
-                    FirstName = message.From.FirstName,
+                    FirstName = message.From.FirstName ?? null,
                     UserName = message.From.Username,
-                    LastName = message.From.Username
+                    LastName = message.From.LastName ?? null
                 });
 
-                await client.SendTextMessageAsync(message.Chat.Id, "Напишите нам, на рассылку каких сериалов вы хотите подписаться.");
-
                 unitOfWork.Save();
+
+                await client.SendTextMessageAsync(message.Chat.Id, "Напишите нам, на рассылку каких сериалов вы хотите подписаться." +
+                    "Введите /search \"Сериал для поиска\"");
             }
         }
     }

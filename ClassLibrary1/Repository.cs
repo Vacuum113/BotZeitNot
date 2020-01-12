@@ -10,7 +10,8 @@ namespace BotZeitNot.DAL
     public class Repository<T, TPrimaryKey> : IRepository<T, TPrimaryKey>
         where T : class, IEntity<TPrimaryKey>
     {
-        private readonly ApplicationDbContext _context;
+        protected readonly ApplicationDbContext _context;
+
         public DbSet<T> Table { get; set; }
 
         public Repository(ApplicationDbContext context)
@@ -27,20 +28,17 @@ namespace BotZeitNot.DAL
         public TPrimaryKey Add(T entity)
         {
             Table.Add(entity);
-            _context.SaveChanges();
             return entity.Id;
         }
 
         public void Update(T entity)
         {
             Table.Update(entity);
-            _context.SaveChanges();
         }
 
         public void Delete(T entity)
         {
             Table.Remove(entity);
-            _context.SaveChanges();
         }
 
         public IEnumerable<T> All()

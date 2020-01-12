@@ -7,7 +7,7 @@ namespace BotZeitNot.DAL.Domain.Entity
     {
         public string NameRu { get; set; }
 
-        public string NameEu { get; set; }
+        public string NameEn { get; set; }
 
         public int SeasonsCount { get; set; }
 

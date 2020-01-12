@@ -22,14 +22,13 @@ namespace BotZeitNot.Api
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             var configBot = Configuration.GetSection("BotConfigProps").Get<BotConfigProps>();
 
             Bot bot = new Bot(configBot);
 
-            bot.Run("" /*+ configBot.Token*/ );
+            bot.Run("https://578c0c42.ngrok.io/update");
 
             services.AddSingleton(servicesProvider =>
             {
@@ -56,7 +55,6 @@ namespace BotZeitNot.Api
                 .AddNewtonsoftJson();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -66,7 +64,6 @@ namespace BotZeitNot.Api
             }
             else
             {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
@@ -75,19 +72,9 @@ namespace BotZeitNot.Api
 
             app.UseAuthentication();
 
-            var token = Configuration.GetSection("BotConfigProps").Get<BotConfigProps>().Token;
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                //endpoints.MapControllerRoute(
-                //    "WithToken",
-                //    "{controller}/" + token + "{action}",
-                //    new { controller = "Update", action = "TelegramUpdates" }
-                //    );
-                //endpoints.MapGet(
-                //    "{controller}/" + token + "{action}"
-                //    );
             });
         }
     }

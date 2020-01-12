@@ -5,6 +5,6 @@ namespace BotZeitNot.BL.TelegramBotService
 {
     public interface ITelegramBotService : IService
     {
-        void ExecuteCommand(Update update);
+        void Run(Update update);
     }
 }
