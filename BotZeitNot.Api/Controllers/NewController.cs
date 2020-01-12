@@ -1,7 +1,4 @@
-﻿using BotZeitNot.DAL;
-using BotZeitNot.DAL.Loader;
-using System.Collections.Generic;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BotZeitNot.Api.Controllers

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using System.Text.Json;
-using System.Linq;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace BotZeitNot.DAL.Loader
 {
@@ -48,7 +47,7 @@ namespace BotZeitNot.DAL.Loader
         public async static Task<List<Series>> FromJson()
         {
             List<Series> series;
-            using (FileStream fs =new FileStream("Series.json", FileMode.Open))
+            using (FileStream fs = new FileStream("Series.json", FileMode.Open))
             {
                 series = await JsonSerializer.DeserializeAsync<List<Series>>(fs);
             }

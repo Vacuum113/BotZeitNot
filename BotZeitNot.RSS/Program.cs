@@ -44,7 +44,7 @@ namespace BotZeitNot.RSS
 
                 var exporter = new Exporter(settings);
 
-                while(!exporter.Export(listEpisodes, listEpisodesPrev))
+                while (!exporter.Export(listEpisodes, listEpisodesPrev))
                 {
                     Thread.Sleep(TimeSpan.FromMinutes(2));
                 }

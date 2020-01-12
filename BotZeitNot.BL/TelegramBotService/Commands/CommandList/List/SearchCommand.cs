@@ -3,7 +3,6 @@ using BotZeitNot.DAL.Domain.Entity;
 using BotZeitNot.DAL.Domain.Repositories;
 using BotZeitNot.Domain.Interface;
 using System.Collections.Generic;
-using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -27,24 +26,24 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList.List
 
         public async override void Execute(Message message, TelegramBotClient client)
         {
-            if(message.Text.Length < 8)
+            if (message.Text.Length < 8)
             {
                 return;
             }
 
             string text = message.Text.Remove(0, 8).TrimStart();
 
-            if(text == "")
+            if (text == "")
             {
                 return;
             }
 
             IEnumerable<Series> series = _seriesRepository.GetByNameAllMatchSeries(text);
-            List<InlineKeyboardButton> buttons = new List<InlineKeyboardButton>();
 
+            var buttons = new List<InlineKeyboardButton>();
             foreach (var item in series)
             {
-                InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton()
+                var inlineKeyboardButton = new InlineKeyboardButton()
                 {
                     Text = item.NameRu,
                     CallbackData = "Search/" + item.NameRu

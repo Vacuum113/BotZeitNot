@@ -26,7 +26,7 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList.List
         {
             using (IUnitOfWork unitOfWork = _unitOfWorkFactory.Create())
             {
-                if(_userRepository.GetByTelegramId(message.From.Id))
+                if (_userRepository.ContainsUserByTelegramId(message.From.Id))
                 {
                     return;
                 }

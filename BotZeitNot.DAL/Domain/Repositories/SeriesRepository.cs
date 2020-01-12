@@ -30,7 +30,13 @@ namespace BotZeitNot.DAL.Domain.Repositories
             return _context.Series.
                 Include(s => s.Seasons).
                 ThenInclude(s => s.Episodes).
-                FirstOrDefault(a=>a.NameRu == name);
+                FirstOrDefault(a => a.NameRu == name);
+        }
+
+        public Series GetByNameRuSeries(string nameRu)
+        {
+            return Table
+                    .First(s => s.NameRu.ToLowerInvariant() == nameRu.ToLowerInvariant());
         }
     }
 }

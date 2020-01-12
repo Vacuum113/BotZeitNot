@@ -13,20 +13,16 @@ namespace BotZeitNot.RSS
     {
         private List<Episode> _prevEpisodes;
 
-        public List<Episode> PrevEpisodes 
-        {
-            get 
-            {
+        public List<Episode> PrevEpisodes {
+            get {
                 return _prevEpisodes;
             }
         }
 
         private List<Episode> _episodes;
 
-        public List<Episode> Episodes 
-        {
-            get 
-            {
+        public List<Episode> Episodes {
+            get {
                 return _episodes;
             }
         }
@@ -76,16 +72,16 @@ namespace BotZeitNot.RSS
 
         private List<Episode> IsolatingDifference(List<Episode> newEpisodes, List<Episode> prevEpisodes)
         {
-            if (newEpisodes == null) 
+            if (newEpisodes == null)
                 throw new NullReferenceException();
-            else if (prevEpisodes == null || prevEpisodes.Count == 0) 
+            else if (prevEpisodes == null || prevEpisodes.Count == 0)
                 return newEpisodes;
 
             List<Episode> difference = new List<Episode>();
 
-            foreach(var item in newEpisodes)
+            foreach (var item in newEpisodes)
             {
-                if(!prevEpisodes.Contains(item))
+                if (!prevEpisodes.Contains(item))
                 {
                     difference.Add(item);
                 }
