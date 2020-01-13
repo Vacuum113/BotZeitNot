@@ -1,11 +1,12 @@
 ﻿using BotZeitNot.BL.TelegramBotService.Commands;
-using BotZeitNot.BL.TelegramBotService.Commands.CommandList;
+using BotZeitNot.BL.TelegramBotService.Helpers;
 using BotZeitNot.BL.TelegramBotService.TelegramBotConfig;
 using BotZeitNot.DAL;
 using BotZeitNot.DAL.Domain.Repositories;
 using BotZeitNot.Domain.Interface;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -32,7 +33,7 @@ namespace BotZeitNot.BL.TelegramBotService
             _unitOfWorkFactory = unitOfWorkFactory;
         }
 
-        public void Run(Update update)
+        public async Task Run(Update update)
         {
             if (update == null)
             {
@@ -42,18 +43,19 @@ namespace BotZeitNot.BL.TelegramBotService
             switch (update.Type)
             {
                 case UpdateType.Message:
-                    IfMessage(update.Message);
+                    await IfMessage(update.Message);
                     break;
                 case UpdateType.CallbackQuery:
-                    IfCAllbackQuery(update);
+                    await IfCAllbackQuery(update);
                     break;
                 default:
-                    Default(update);
+                    await Default(update);
                     break;
             }
         }
 
-        public async void IfMessage(Message message)
+
+        public async Task IfMessage(Message message)
         {
             if (
                 message != null &&
@@ -78,7 +80,7 @@ namespace BotZeitNot.BL.TelegramBotService
             }
         }
 
-        public void IfCAllbackQuery(Update update)
+        public async Task IfCAllbackQuery(Update update)
         {
             if (
                 update.CallbackQuery != null &&
@@ -87,11 +89,11 @@ namespace BotZeitNot.BL.TelegramBotService
                 )
                 if (update.CallbackQuery.Data.Contains("Search"))
                 {
-                    SubscriptionOnSeries(update.CallbackQuery);
+                     await SubscriptionOnSeries(update.CallbackQuery);
                 }
         }
 
-        public async void Default(Update update)
+        public async Task Default(Update update)
         {
             var defaultString = "Извините, не понял вас.\n" +
                                 "Для просмотра списка команд - " +
@@ -101,12 +103,10 @@ namespace BotZeitNot.BL.TelegramBotService
             await _client.SendTextMessageAsync(update.Message.Chat.Id, defaultString);
         }
 
-        public async void SubscriptionOnSeries(CallbackQuery callbackQuery)
+        public async Task SubscriptionOnSeries(CallbackQuery callbackQuery)
         {
-            await _client.AnswerCallbackQueryAsync
-                (
-                callbackQuery.Id
-                );
+            long chatId = callbackQuery.Message.Chat.Id;
+            string nameRu = callbackQuery.Data.Split("/")[1];
 
             using (IUnitOfWork unitOfWork = _unitOfWorkFactory.Create())
             {
@@ -120,54 +120,33 @@ namespace BotZeitNot.BL.TelegramBotService
                     string errorMessage = "Пользователь не был найден, " +
                                           "попробуйте начать с команды /start";
 
-                    await _client.SendTextMessageAsync(callbackQuery.Message.Chat.Id, errorMessage);
+                    await MessageToTelegram.SendCallBackMessageTelegram(callbackQuery, errorMessage, _client);
                     return;
                 }
 
-                string nameRu = callbackQuery.Data.Split("/")[1];
-
-                var userSeries = user.
-                    SeriesUser.
-                    Where(su => su.Series.NameRu == nameRu).
-                    Select(su => su.Series).
+                var userSeries = user.SubscriptionSeries.
+                    Where(s => s.SeriesNameRu == nameRu).
                     FirstOrDefault();
 
-                if (userSeries == default)
+                if (userSeries != default)
                 {
-                    string errorMessage = "Вы уже подписаны на " + nameRu;
+                    string errorMessage = $"Вы уже подписаны на {nameRu}";
 
-                    await _client.SendTextMessageAsync(callbackQuery.Message.Chat.Id, errorMessage);
+                    await MessageToTelegram.SendCallBackMessageTelegram(callbackQuery, errorMessage, _client);
                     return;
                 }
-
+                //bug
                 var series = seriesRepository.GetByNameRuSeries(nameRu);
 
-                if (!userRepository.SubscriprionOnSeries(series, user))
-                {
-                    string errorMessage = "Произошла ошибка на стороне сервера повторите попытку";
-
-                    await _client.SendTextMessageAsync(callbackQuery.Message.Chat.Id, errorMessage);
-                    return;
-                }
-
+                userRepository.SubscriprionOnSeries(series, user);
                 unitOfWork.Save();
             }
 
             var newSeriesMessage = callbackQuery.From.FirstName +
-                ", Вы подписались на новые серии: "
-                + callbackQuery.Data.Split("/")[1];
+                                   ", Вы подписались на новые серии: " +
+                                   callbackQuery.Data.Split("/")[1];
 
-            await _client.SendTextMessageAsync
-                (
-                callbackQuery.Message.Chat.Id,
-                newSeriesMessage
-                );
-
-            await _client.DeleteMessageAsync
-                (
-                callbackQuery.Message.Chat.Id,
-                callbackQuery.Message.MessageId
-                );
+            await MessageToTelegram.SendCallBackMessageTelegram(callbackQuery, newSeriesMessage, _client);
         }
 
     }

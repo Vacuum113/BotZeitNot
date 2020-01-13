@@ -13,11 +13,13 @@ namespace BotZeitNot.RSS
 
         static void Main(string[] args)
         {
-            Configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", true, true)
-                .Build();
+            Configure.ConfigurationFromFile();
 
-            var settings = Configuration.GetSection("Settings").Get<Settings>();
+            Configuration = Configure.Configuration;
+
+            var settings = Configuration.
+                                    GetSection("Settings")
+                                    .Get<Settings>();
 
             XmlReader xmlReader;
             List<Tuple<string, string>> episodesStrings;

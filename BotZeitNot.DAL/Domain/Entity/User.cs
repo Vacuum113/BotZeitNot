@@ -13,6 +13,6 @@ namespace BotZeitNot.DAL.Domain.Entity
 
         public string LastName { get; set; }
 
-        public ICollection<SeriesUser> SeriesUser { get; set; }
+        public ICollection<SubscriptionSeries> SubscriptionSeries { get; set; }
     }
 }

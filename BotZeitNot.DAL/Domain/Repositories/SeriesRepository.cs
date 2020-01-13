@@ -15,8 +15,8 @@ namespace BotZeitNot.DAL.Domain.Repositories
 
         public IEnumerable<Series> GetByNameAllMatchSeries(string name)
         {
-            Expression<Func<Series, bool>> predicate = a => (a.NameRu.ToLowerInvariant() == name.ToLowerInvariant() ||
-                                                             a.NameEn.ToLowerInvariant() == name.ToLowerInvariant()) &&
+            Expression<Func<Series, bool>> predicate = a => (a.NameRu == name ||
+                                                             a.NameEn == name) &&
                                                              !a.IsCompleted;
 
             return Table.

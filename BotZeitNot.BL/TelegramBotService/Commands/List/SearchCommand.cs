@@ -7,7 +7,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList.List
+namespace BotZeitNot.BL.TelegramBotService.Commands.List
 {
     class SearchCommand : Command
     {

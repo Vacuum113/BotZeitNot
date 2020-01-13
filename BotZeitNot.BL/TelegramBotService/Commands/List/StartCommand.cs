@@ -6,7 +6,7 @@ using Telegram.Bot;
 using Message = Telegram.Bot.Types.Message;
 
 
-namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList.List
+namespace BotZeitNot.BL.TelegramBotService.Commands.List
 {
     public class StartCommand : Command
     {

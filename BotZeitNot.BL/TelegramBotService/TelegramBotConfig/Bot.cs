@@ -20,6 +20,11 @@ namespace BotZeitNot.BL.TelegramBotService.TelegramBotConfig
             _client = new TelegramBotClient(botConfig.Token, proxy);
         }
 
+        public Bot(string token)
+        {
+            _client = new TelegramBotClient(token);
+        }
+
         public async void Run(string responseUrl)
         {
             await _client.SetWebhookAsync(responseUrl);

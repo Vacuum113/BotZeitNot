@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList
+namespace BotZeitNot.BL.TelegramBotService.Commands
 {
     public interface ICommandList
     {

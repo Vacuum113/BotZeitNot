@@ -15,8 +15,6 @@ namespace BotZeitNot.DAL.Domain.Entity
 
         public bool IsCompleted { get; set; }
 
-        public ICollection<SeriesUser> SeriesUser { get; set; }
-
         public ICollection<Season> Seasons { get; set; }
     }
 }

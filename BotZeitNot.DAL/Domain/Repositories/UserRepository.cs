@@ -18,19 +18,19 @@ namespace BotZeitNot.DAL.Domain.Repositories
         public User GetUserAndSeriesByTelegramId(int id)
         {
             return Table
-                .Include(u => u.SeriesUser)
-                .ThenInclude(su => su.Series)
+                .Include(u => u.SubscriptionSeries)
                 .FirstOrDefault(u => u.TelegramId == id);
         }
 
-        public bool SubscriprionOnSeries(Series series, User user)
+        public void SubscriprionOnSeries(Series series, User user)
         {
-            user.SeriesUser.Add(new SeriesUser { Series = series });
+            user.SubscriptionSeries.Add(new SubscriptionSeries 
+            { 
+                TelegramUserId = user.Id,
+                SeriesNameRu = series.NameRu
+            });
+
             Table.Add(user);
-
-            int seriesId = user.SeriesUser.First(su => su.Series.NameRu == series.NameRu).SeriesId;
-
-            return seriesId != 0 ? true : false;
         }
     }
 }

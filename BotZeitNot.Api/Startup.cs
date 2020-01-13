@@ -1,6 +1,6 @@
 using AutoMapper;
 using BotZeitNot.BL.TelegramBotService;
-using BotZeitNot.BL.TelegramBotService.Commands.CommandList;
+using BotZeitNot.BL.TelegramBotService.Commands;
 using BotZeitNot.BL.TelegramBotService.TelegramBotConfig;
 using BotZeitNot.DAL;
 using BotZeitNot.Domain.Interface;
@@ -26,9 +26,9 @@ namespace BotZeitNot.Api
         {
             var configBot = Configuration.GetSection("BotConfigProps").Get<BotConfigProps>();
 
-            Bot bot = new Bot(configBot);
+            Bot bot = new Bot(configBot.Token);
 
-            bot.Run("https://578c0c42.ngrok.io/update");
+            bot.Run("https://ceeb9266.ngrok.io/update");
 
             services.AddSingleton(servicesProvider =>
             {
@@ -60,7 +60,6 @@ namespace BotZeitNot.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
             }
             else
             {
