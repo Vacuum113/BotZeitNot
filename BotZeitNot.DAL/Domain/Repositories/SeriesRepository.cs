@@ -36,7 +36,7 @@ namespace BotZeitNot.DAL.Domain.Repositories
         public Series GetByNameRuSeries(string nameRu)
         {
             return Table
-                    .First(s => s.NameRu.ToLowerInvariant() == nameRu.ToLowerInvariant());
+                    .First(s => s.NameRu == nameRu);
         }
     }
 }

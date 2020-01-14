@@ -140,14 +140,13 @@ namespace BotZeitNot.BL.TelegramBotService
 
                 userRepository.SubscriprionOnSeries(series, user);
                 unitOfWork.Save();
+
+                var newSeriesMessage = callbackQuery.From.FirstName +
+                       ", Вы подписались на новые серии: " +
+                       callbackQuery.Data.Split("/")[1];
+
+                await MessageToTelegram.SendCallBackMessageTelegram(callbackQuery, newSeriesMessage, _client);
             }
-
-            var newSeriesMessage = callbackQuery.From.FirstName +
-                                   ", Вы подписались на новые серии: " +
-                                   callbackQuery.Data.Split("/")[1];
-
-            await MessageToTelegram.SendCallBackMessageTelegram(callbackQuery, newSeriesMessage, _client);
         }
-
     }
 }

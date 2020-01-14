@@ -71,11 +71,6 @@ namespace BotZeitNot.DAL
             _context.SaveChanges();
         }
 
-        public async void SaveAsync()
-        {
-            await _context.SaveChangesAsync();
-        }
-
         public virtual void Dispose(bool disposing)
         {
             if (!this._disposed)
