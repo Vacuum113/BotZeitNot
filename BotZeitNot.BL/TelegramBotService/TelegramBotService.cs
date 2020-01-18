@@ -1,11 +1,8 @@
-﻿using BotZeitNot.BL.TelegramBotService.Commands;
-using BotZeitNot.BL.TelegramBotService.Helpers;
+﻿using BotZeitNot.BL.TelegramBotService.AnswerCallback;
+using BotZeitNot.BL.TelegramBotService.Commands;
 using BotZeitNot.BL.TelegramBotService.TelegramBotConfig;
-using BotZeitNot.DAL;
-using BotZeitNot.DAL.Domain.Repositories;
 using BotZeitNot.Domain.Interface;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -55,7 +52,7 @@ namespace BotZeitNot.BL.TelegramBotService
         }
 
 
-        public async Task IfMessage(Message message)
+        private async Task IfMessage(Message message)
         {
             if (
                 message != null &&
@@ -65,9 +62,10 @@ namespace BotZeitNot.BL.TelegramBotService
                 )
             {
                 Command command = _commandList.GetCommand(message.Text);
-
                 if (command != null)
+                {
                     command.Execute(message, _client);
+                }
                 else
                 {
                     var helpString = "Для просмотра списка команд " +
@@ -80,20 +78,28 @@ namespace BotZeitNot.BL.TelegramBotService
             }
         }
 
-        public async Task IfCAllbackQuery(Update update)
+        private async Task IfCAllbackQuery(Update update)
         {
             if (
                 update.CallbackQuery != null &&
                 !update.CallbackQuery.From.IsBot &&
                 update.CallbackQuery.Message != null
                 )
-                if (update.CallbackQuery.Data.Contains("Search"))
+                switch(update.CallbackQuery.Data.Split("/")[0])
                 {
-                     await SubscriptionOnSeries(update.CallbackQuery);
+                    case "Search":
+                        await new SearchAnswerCallback()
+                            .SubscriptionOnSeries(update.CallbackQuery, _unitOfWorkFactory, _client);
+                        break;
+                    case "Cancel":
+                        await new CancelAnswerCallback()
+                            .CancelSubscriptionOnSeries(update.CallbackQuery, _unitOfWorkFactory, _client);
+                        break;
                 }
         }
 
-        public async Task Default(Update update)
+
+        private async Task Default(Update update)
         {
             var defaultString = "Извините, не понял вас.\n" +
                                 "Для просмотра списка команд - " +
@@ -101,52 +107,6 @@ namespace BotZeitNot.BL.TelegramBotService
                                 "или напишите \"/\" для просмотра доступных команд.";
 
             await _client.SendTextMessageAsync(update.Message.Chat.Id, defaultString);
-        }
-
-        public async Task SubscriptionOnSeries(CallbackQuery callbackQuery)
-        {
-            long chatId = callbackQuery.Message.Chat.Id;
-            string nameRu = callbackQuery.Data.Split("/")[1];
-
-            using (IUnitOfWork unitOfWork = _unitOfWorkFactory.Create())
-            {
-                UserRepository userRepository = ((UnitOfWork)unitOfWork).Users;
-                SeriesRepository seriesRepository = ((UnitOfWork)unitOfWork).Series;
-
-                var user = userRepository.GetUserAndSeriesByTelegramId(callbackQuery.From.Id);
-
-                if (user == default)
-                {
-                    string errorMessage = "Пользователь не был найден, " +
-                                          "попробуйте начать с команды /start";
-
-                    await MessageToTelegram.SendCallBackMessageTelegram(callbackQuery, errorMessage, _client);
-                    return;
-                }
-
-                var userSeries = user.SubscriptionSeries.
-                    Where(s => s.SeriesNameRu == nameRu).
-                    FirstOrDefault();
-
-                if (userSeries != default)
-                {
-                    string errorMessage = $"Вы уже подписаны на {nameRu}";
-
-                    await MessageToTelegram.SendCallBackMessageTelegram(callbackQuery, errorMessage, _client);
-                    return;
-                }
-                //bug
-                var series = seriesRepository.GetByNameRuSeries(nameRu);
-
-                userRepository.SubscriprionOnSeries(series, user);
-                unitOfWork.Save();
-
-                var newSeriesMessage = callbackQuery.From.FirstName +
-                       ", Вы подписались на новые серии: " +
-                       callbackQuery.Data.Split("/")[1];
-
-                await MessageToTelegram.SendCallBackMessageTelegram(callbackQuery, newSeriesMessage, _client);
-            }
         }
     }
 }

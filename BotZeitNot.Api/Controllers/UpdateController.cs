@@ -1,8 +1,9 @@
 ﻿using BotZeitNot.BL.TelegramBotService;
+using BotZeitNot.Shared.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using Telegram.Bot.Types;
-
 
 namespace BotZeitNot.Api.Controllers
 {
@@ -32,6 +33,12 @@ namespace BotZeitNot.Api.Controllers
             _botService.Run(update);
 
             return Ok();
+        }
+
+        [HttpPost("NewEpisodes")]
+        public IActionResult Post(IEnumerable<Episode> episodes)
+        {
+
         }
     }
 }

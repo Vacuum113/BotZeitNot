@@ -16,8 +16,7 @@ namespace BotZeitNot.DAL.Domain.Repositories
         public IEnumerable<Series> GetByNameAllMatchSeries(string name)
         {
             Expression<Func<Series, bool>> predicate = a => (a.NameRu == name ||
-                                                             a.NameEn == name) &&
-                                                             !a.IsCompleted;
+                                                             a.NameEn == name);
 
             return Table.
                 Where(predicate).

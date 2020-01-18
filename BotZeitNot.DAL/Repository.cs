@@ -12,7 +12,7 @@ namespace BotZeitNot.DAL
     {
         protected readonly ApplicationDbContext _context;
 
-        public DbSet<T> Table { get; set; }
+        protected DbSet<T> Table { get; set; }
 
         public Repository(ApplicationDbContext context)
         {

@@ -8,7 +8,14 @@ namespace BotZeitNot.BL.TelegramBotService.Helpers
     {
         public static async Task SendCallBackMessageTelegram(CallbackQuery callbackQuery, string message, TelegramBotClient client)
         {
-            await client.AnswerCallbackQueryAsync(callbackQuery.Id);
+            try
+            {
+                await client.AnswerCallbackQueryAsync(callbackQuery.Id);
+            }
+            catch
+            {
+
+            }
             await client.SendTextMessageAsync(callbackQuery.Message.Chat.Id, message);
             await client.DeleteMessageAsync
                 (

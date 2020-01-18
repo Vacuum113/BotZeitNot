@@ -26,11 +26,11 @@ namespace BotZeitNot.DAL.Domain.Repositories
         {
             user.SubscriptionSeries.Add(new SubscriptionSeries 
             { 
-                TelegramUserId = user.Id,
+                TelegramUserId = user.TelegramId,
                 SeriesNameRu = series.NameRu
             });
 
-            Table.Add(user);
+            Table.Update(user);
         }
     }
 }

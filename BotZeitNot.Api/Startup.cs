@@ -28,7 +28,7 @@ namespace BotZeitNot.Api
 
             Bot bot = new Bot(configBot.Token);
 
-            bot.Run("https://ceeb9266.ngrok.io/update");
+            bot.Run("https://a39a98df.ngrok.io/update");
 
             services.AddSingleton(servicesProvider =>
             {

@@ -43,12 +43,15 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
             var buttons = new List<InlineKeyboardButton>();
             foreach (var item in series)
             {
-                var inlineKeyboardButton = new InlineKeyboardButton()
+                if (item.IsCompleted != true)
                 {
-                    Text = item.NameRu,
-                    CallbackData = "Search/" + item.NameRu
-                };
-                buttons.Add(inlineKeyboardButton);
+                    var inlineKeyboardButton = new InlineKeyboardButton()
+                    {
+                        Text = item.NameRu,
+                        CallbackData = "Search/" + item.NameRu
+                    };
+                    buttons.Add(inlineKeyboardButton);
+                }
             }
 
             await client.SendTextMessageAsync(

@@ -12,6 +12,7 @@ namespace BotZeitNot.DAL
         private SeriesRepository _seriesRepository;
         private SeasonRepository _seasonRepository;
         private EpisodeRepository _episodeRepository;
+        private SubSeriesRepository _subSeriesRepository;
 
         private bool _disposed;
 
@@ -60,8 +61,18 @@ namespace BotZeitNot.DAL
             }
         }
 
+        public SubSeriesRepository SubSeries {
+            get {
+                if (_subSeriesRepository == null)
+                {
+                    _subSeriesRepository = new SubSeriesRepository(_context);
+                }
+                return _subSeriesRepository;
+            }
+        }
 
-        public IRepository<T, TPrimaryKey> GetRepository<T, TPrimaryKey>() where T : class, IEntity<TPrimaryKey>
+        public IRepository<T, TPrimaryKey> GetRepository<T, TPrimaryKey>() 
+            where T : class, IEntity<TPrimaryKey>
         {
             return new Repository<T, TPrimaryKey>(_context);
         }
