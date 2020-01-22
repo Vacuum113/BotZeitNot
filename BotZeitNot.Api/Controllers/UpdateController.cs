@@ -21,14 +21,8 @@ namespace BotZeitNot.Api.Controllers
             _botService = botService;
         }
 
-        [HttpGet]
-        public string Get()
-        {
-            return "kek";
-        }
-
-        [HttpPost]
-        public IActionResult TelegramUpdates(Update update)
+        [HttpPost("GetUpdate")]
+        public IActionResult Post(Update update)
         {
             _botService.Run(update);
 
@@ -36,9 +30,11 @@ namespace BotZeitNot.Api.Controllers
         }
 
         [HttpPost("NewEpisodes")]
-        public IActionResult Post(IEnumerable<Episode> episodes)
+        public IActionResult Post(IEnumerable<EpisodeDto> episodes)
         {
+            _botService.SendingNewSeries(episodes);
 
+            return Ok();
         }
     }
 }

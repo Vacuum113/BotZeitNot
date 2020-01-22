@@ -4,7 +4,7 @@ namespace BotZeitNot.DAL.Domain.Entity
 {
     public class SubscriptionSeries : BaseEntity
     {
-        public int TelegramUserId { get; set; }
+        public long ChatId { get; set; }
 
         public string SeriesNameRu { get; set; }
 

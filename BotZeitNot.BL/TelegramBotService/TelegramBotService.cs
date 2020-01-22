@@ -1,8 +1,11 @@
-﻿using BotZeitNot.BL.TelegramBotService.AnswerCallback;
+﻿using BotZeitNot.BL.TelegramBotService.Answer;
 using BotZeitNot.BL.TelegramBotService.Commands;
+using BotZeitNot.BL.TelegramBotService.MassMailingNewEpisode;
 using BotZeitNot.BL.TelegramBotService.TelegramBotConfig;
 using BotZeitNot.Domain.Interface;
+using BotZeitNot.Shared.Dto;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -51,6 +54,12 @@ namespace BotZeitNot.BL.TelegramBotService
             }
         }
 
+        public void SendingNewSeries(IEnumerable<EpisodeDto> episodes)
+        {
+            new MassMailing(_unitOfWorkFactory, _client)
+                .SendingNewSeries(episodes);
+        }
+
 
         private async Task IfMessage(Message message)
         {
@@ -64,14 +73,14 @@ namespace BotZeitNot.BL.TelegramBotService
                 Command command = _commandList.GetCommand(message.Text);
                 if (command != null)
                 {
-                    command.Execute(message, _client);
+                    await command.Execute(message, _client);
                 }
                 else
                 {
-                    var helpString = "Для просмотра списка команд " +
-                                     "- отправте сообщение: \"/help\"\n " +
-                                     "или напишите \"/\" для " +
-                                     "просмотра доступных команд.";
+                    const string helpString = "Для просмотра списка команд " +
+                                              "- отправте сообщение: \"/help\"\n " +
+                                              "или напишите \"/\" для " +
+                                              "просмотра доступных команд.";
 
                     await _client.SendTextMessageAsync(message.Chat.Id, helpString);
                 }
@@ -85,26 +94,30 @@ namespace BotZeitNot.BL.TelegramBotService
                 !update.CallbackQuery.From.IsBot &&
                 update.CallbackQuery.Message != null
                 )
-                switch(update.CallbackQuery.Data.Split("/")[0])
+            {
+                var answerCallback = new AnswerCallback(update.CallbackQuery, _unitOfWorkFactory, _client);
+                switch (update.CallbackQuery.Data.Split("/")[0])
                 {
                     case "Search":
-                        await new SearchAnswerCallback()
-                            .SubscriptionOnSeries(update.CallbackQuery, _unitOfWorkFactory, _client);
+                        await answerCallback
+                            .Search();
                         break;
+
                     case "Cancel":
-                        await new CancelAnswerCallback()
-                            .CancelSubscriptionOnSeries(update.CallbackQuery, _unitOfWorkFactory, _client);
+                        await answerCallback
+                            .Cancel();
                         break;
                 }
+            }
         }
 
 
         private async Task Default(Update update)
         {
-            var defaultString = "Извините, не понял вас.\n" +
-                                "Для просмотра списка команд - " +
-                                "отправте сообщение: \"/help\"\n " +
-                                "или напишите \"/\" для просмотра доступных команд.";
+            const string defaultString = "Извините, не понял вас.\n" +
+                                         "Для просмотра списка команд - " +
+                                         "отправте сообщение: \"/help\"\n " +
+                                         "или напишите \"/\" для просмотра доступных команд.";
 
             await _client.SendTextMessageAsync(update.Message.Chat.Id, defaultString);
         }

@@ -1,6 +1,6 @@
 ﻿namespace BotZeitNot.Shared.Dto
 {
-    public class Episode
+    public class EpisodeDto
     {
         public int Number { get; set; }
 

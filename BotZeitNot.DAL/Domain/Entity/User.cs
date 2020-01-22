@@ -5,6 +5,8 @@ namespace BotZeitNot.DAL.Domain.Entity
 {
     public class User : BaseEntity
     {
+        public long ChatId { get; set; }
+
         public int TelegramId { get; set; }
 
         public string UserName { get; set; }

@@ -25,10 +25,9 @@ namespace BotZeitNot.DAL
             return Table.FirstOrDefault(c => c.Id.Equals(id));
         }
 
-        public TPrimaryKey Add(T entity)
+        public void Add(T entity)
         {
             Table.Add(entity);
-            return entity.Id;
         }
 
         public void Update(T entity)

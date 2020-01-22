@@ -1,32 +1,41 @@
 ﻿using BotZeitNot.DAL.Domain.Entity;
+using BotZeitNot.DAL.Domain.Repositories.SpecificStorage;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace BotZeitNot.DAL.Domain.Repositories
 {
-    public class SubSeriesRepository : Repository<SubscriptionSeries, int>
+    public class SubSeriesRepository : Repository<SubscriptionSeries, int>, ISubSeriesRepository
     {
         public SubSeriesRepository(ApplicationDbContext context) : base(context)
         { }
 
-        public IEnumerable<string> GetAllSeriesNameByTelegramId(int telegramId)
+        public IEnumerable<string> GetAllSeriesNameByChatId(long chatId)
         {
             return Table.
-                Where(ss => ss.TelegramUserId == telegramId).
+                Where(ss => ss.ChatId == chatId).
                 Select(ss => ss.SeriesNameRu);
         }
 
-        public void CancelSubscription(int telegramId, string seriesNameRu)
+        public void CancelSubscription(long chatId, string seriesNameRu)
         {
             SubscriptionSeries series = Table.
                 FirstOrDefault
                 (
                 ss =>
-                ss.TelegramUserId == telegramId &&
+                ss.ChatId == chatId &&
                 ss.SeriesNameRu == seriesNameRu
                 );
 
             Table.Remove(series);
+        }
+
+        public long[] GetChatIdBySeriesNameRu(string titleSeries)
+        {
+            return Table
+              .Where(ss => ss.SeriesNameRu == titleSeries)
+              .Select(ss => ss.ChatId)
+              .ToArray();
         }
     }
 }

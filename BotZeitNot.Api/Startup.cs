@@ -3,6 +3,8 @@ using BotZeitNot.BL.TelegramBotService;
 using BotZeitNot.BL.TelegramBotService.Commands;
 using BotZeitNot.BL.TelegramBotService.TelegramBotConfig;
 using BotZeitNot.DAL;
+using BotZeitNot.DAL.Domain.Repositories;
+using BotZeitNot.DAL.Domain.Repositories.SpecificStorage;
 using BotZeitNot.Domain.Interface;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -28,7 +30,7 @@ namespace BotZeitNot.Api
 
             Bot bot = new Bot(configBot.Token);
 
-            bot.Run("https://a39a98df.ngrok.io/update");
+            bot.Run("https://f27afa6d.ngrok.io/Update/GetUpdate");
 
             services.AddSingleton(servicesProvider =>
             {
@@ -43,7 +45,15 @@ namespace BotZeitNot.Api
                 options.UseMySql(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
+            services.AddScoped<IUserRepository, UserRepository>();
+
+            services.AddScoped<ISubSeriesRepository, SubSeriesRepository>();
+
+            services.AddScoped<ISeriesRepository, SeriesRepository>();
+
+            services.AddScoped<ISeasonRepository, SeasonRepository>();
+
+            services.AddScoped<IEpisodeRepository, EpisodeRepository>();
 
             services.AddScoped<ICommandList, CommandList>();
 

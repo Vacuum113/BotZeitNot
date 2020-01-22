@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using System.Threading.Tasks;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace BotZeitNot.BL.TelegramBotService.Commands
@@ -12,7 +13,7 @@ namespace BotZeitNot.BL.TelegramBotService.Commands
 
         }
 
-        public abstract void Execute(Message message, TelegramBotClient client);
+        public abstract Task Execute(Message message, TelegramBotClient client);
 
         public bool Contains(string message)
         {

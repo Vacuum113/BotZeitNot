@@ -71,7 +71,7 @@ namespace BotZeitNot.DAL
             }
         }
 
-        public IRepository<T, TPrimaryKey> GetRepository<T, TPrimaryKey>() 
+        public IRepository<T, TPrimaryKey> GetRepository<T, TPrimaryKey>()
             where T : class, IEntity<TPrimaryKey>
         {
             return new Repository<T, TPrimaryKey>(_context);

@@ -6,7 +6,7 @@ namespace BotZeitNot.Domain.Interface
 {
     public interface IRepository<T, TKey> where T : class, IEntity<TKey>
     {
-        TKey Add(T entity);
+        void Add(T entity);
         void Update(T entity);
         void Delete(T entity);
 

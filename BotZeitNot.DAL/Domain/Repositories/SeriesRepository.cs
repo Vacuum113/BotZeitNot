@@ -1,4 +1,5 @@
 ﻿using BotZeitNot.DAL.Domain.Entity;
+using BotZeitNot.DAL.Domain.Repositories.SpecificStorage;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Linq.Expressions;
 
 namespace BotZeitNot.DAL.Domain.Repositories
 {
-    public class SeriesRepository : Repository<Series, int>
+    public class SeriesRepository : Repository<Series, int>, ISeriesRepository
     {
 
         public SeriesRepository(ApplicationDbContext context) : base(context)
@@ -20,8 +21,7 @@ namespace BotZeitNot.DAL.Domain.Repositories
 
             return Table.
                 Where(predicate).
-                Take(7).
-                ToList();
+                Take(7);
         }
 
         public Series GetSeriesSeasonsAndEpisodesByRuName(string name)
