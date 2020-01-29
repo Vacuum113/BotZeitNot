@@ -30,7 +30,7 @@ namespace BotZeitNot.Api
 
             Bot bot = new Bot(configBot.Token);
 
-            bot.Run("https://f27afa6d.ngrok.io/Update/GetUpdate");
+            bot.Run("51.144.241.128:443/Update/GetUpdate");
 
             services.AddSingleton(servicesProvider =>
             {
@@ -48,12 +48,7 @@ namespace BotZeitNot.Api
             services.AddScoped<IUserRepository, UserRepository>();
 
             services.AddScoped<ISubSeriesRepository, SubSeriesRepository>();
-
             services.AddScoped<ISeriesRepository, SeriesRepository>();
-
-            services.AddScoped<ISeasonRepository, SeasonRepository>();
-
-            services.AddScoped<IEpisodeRepository, EpisodeRepository>();
 
             services.AddScoped<ICommandList, CommandList>();
 
@@ -71,14 +66,13 @@ namespace BotZeitNot.Api
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                app.UseHsts();
-            }
+            //else
+            //{
+            //    app.UseHsts();
+            //}
+
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
             app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>

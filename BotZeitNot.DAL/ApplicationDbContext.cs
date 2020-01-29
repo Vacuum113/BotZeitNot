@@ -20,9 +20,5 @@ namespace BotZeitNot.DAL
         public DbSet<Series> Series { get; set; }
 
         public DbSet<SubscriptionSeries> SubscriptionSeries { get; set; }
-
-        public DbSet<Season> Seasons { get; set; }
-
-        public DbSet<Episode> Episodes { get; set; }
     }
 }

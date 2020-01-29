@@ -2,6 +2,8 @@
 using BotZeitNot.DAL.Domain.Entity;
 using BotZeitNot.DAL.Domain.Repositories;
 using BotZeitNot.Domain.Interface;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,21 +23,32 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
 
         private Message _message;
         private TelegramBotClient _client;
+        private ILogger<SearchCommand> _logger;
 
         public SearchCommand(IUnitOfWorkFactory unitOfWorkFactory)
         {
             _unitOfWorkFactory = unitOfWorkFactory;
-
             _seriesRepository = ((UnitOfWork)unitOfWorkFactory.Create()).Series;
+
+            var loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder.AddConsole();
+                builder.AddDebug();
+            });
+            _logger = loggerFactory.CreateLogger<SearchCommand>();
         }
 
         public async override Task Execute(Message message, TelegramBotClient client)
         {
+            _logger.LogInformation($"Time: {DateTime.UtcNow}. Execute search command.");
+
+
             _client = client;
             _message = message;
 
-            if (CheckTextStringLessThan8Char().Result)
+            if (IsTextStringLessThan8Char(_message.Text).Result)
             {
+                _logger.LogInformation($"Time: {DateTime.UtcNow}. Wrong length message text - {_message.Text.Length} < 8.");
                 return;
             }
 
@@ -43,15 +56,16 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
                 Remove(0, 8).
                 TrimStart();
 
-            if (CheckNameSeriesForEmpty(text).Result)
+            if (!IsNameSeriesValid(text).Result)
             {
+                _logger.LogInformation($"Time: {DateTime.UtcNow}. Wrong or empty series name.");
                 return;
             }
 
             List<Series> series = _seriesRepository.GetByNameAllMatchSeries(text).ToList();
-
-            if (CheckSeriesListForEmpty(series).Result)
+            if (!IsSeriesListValid(series).Result)
             {
+                _logger.LogInformation($"Time: {DateTime.UtcNow}. Series not found.");
                 return;
             }
 
@@ -84,9 +98,9 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
         }
 
 
-        private async Task<bool> CheckTextStringLessThan8Char()
+        private async Task<bool> IsTextStringLessThan8Char(string message)
         {
-            if (_message.Text.Length < 8)
+            if (message.Length < 8)
             {
                 string errorMessage = "Что бы найти сериал введите, " +
                                       "без кавычек: /search <Название Сериала>";
@@ -97,7 +111,7 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
             return false;
         }
 
-        private async Task<bool> CheckNameSeriesForEmpty(string text)
+        private async Task<bool> IsNameSeriesValid(string text)
         {
             if (text == "")
             {
@@ -105,12 +119,12 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
                                       "без кавычек: /search <Название Сериала>";
 
                 await _client.SendTextMessageAsync(_message.Chat.Id, errorMessage);
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
 
-        private async Task<bool> CheckSeriesListForEmpty(List<Series> series)
+        private async Task<bool> IsSeriesListValid(List<Series> series)
         {
             if (series == null || series.Count == 0)
             {
@@ -120,9 +134,9 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
                                       "либо такого сериала нет на LostFilm.";
 
                 await _client.SendTextMessageAsync(_message.Chat.Id, errorMessage);
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
 
         private async Task SendSearchButtons(List<Series> series)

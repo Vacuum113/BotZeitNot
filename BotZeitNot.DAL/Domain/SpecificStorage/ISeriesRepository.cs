@@ -7,8 +7,6 @@ namespace BotZeitNot.DAL.Domain.Repositories.SpecificStorage
     {
         public IEnumerable<Series> GetByNameAllMatchSeries(string name);
 
-        public Series GetSeriesSeasonsAndEpisodesByRuName(string name);
-
         public Series GetByNameRuSeries(string nameRu);
     }
 }

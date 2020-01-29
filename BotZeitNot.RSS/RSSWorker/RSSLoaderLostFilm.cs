@@ -12,31 +12,16 @@ namespace BotZeitNot.RSS
     {
         private string _loadingString;
 
-        private HttpClientHandler _clientHandler;
-
         public RSSLoaderLostFilm(Settings settings)
         {
             _loadingString = settings.LostFilmRSSLink;
-
-            IWebProxy proxy = new HttpToSocks5Proxy
-                (
-                settings.SocksIP,
-                settings.SocksPort,
-                settings.SocksUser,
-                settings.SocksPassword
-                );
-
-            _clientHandler = new HttpClientHandler()
-            {
-                Proxy = proxy
-            };
         }
 
         public async Task<XmlReader> LoadFromRSS()
         {
 
             string rssString;
-            using (HttpClient client = new HttpClient(_clientHandler, disposeHandler: true))
+            using (HttpClient client = new HttpClient())
             {
                 var result = await client.GetAsync(_loadingString);
                 var str = await result.Content.ReadAsStringAsync();

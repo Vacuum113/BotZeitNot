@@ -10,8 +10,6 @@ namespace BotZeitNot.DAL
 
         private UserRepository _userRepository;
         private SeriesRepository _seriesRepository;
-        private SeasonRepository _seasonRepository;
-        private EpisodeRepository _episodeRepository;
         private SubSeriesRepository _subSeriesRepository;
 
         private bool _disposed;
@@ -38,26 +36,6 @@ namespace BotZeitNot.DAL
                     _seriesRepository = new SeriesRepository(_context);
                 }
                 return _seriesRepository;
-            }
-        }
-
-        public SeasonRepository Seasons {
-            get {
-                if (_seasonRepository == null)
-                {
-                    _seasonRepository = new SeasonRepository(_context);
-                }
-                return _seasonRepository;
-            }
-        }
-
-        public EpisodeRepository Episodes {
-            get {
-                if (_episodeRepository == null)
-                {
-                    _episodeRepository = new EpisodeRepository(_context);
-                }
-                return _episodeRepository;
             }
         }
 

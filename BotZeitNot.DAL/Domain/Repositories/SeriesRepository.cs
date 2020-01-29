@@ -24,14 +24,6 @@ namespace BotZeitNot.DAL.Domain.Repositories
                 Take(7);
         }
 
-        public Series GetSeriesSeasonsAndEpisodesByRuName(string name)
-        {
-            return _context.Series.
-                Include(s => s.Seasons).
-                ThenInclude(s => s.Episodes).
-                FirstOrDefault(a => a.NameRu == name);
-        }
-
         public Series GetByNameRuSeries(string nameRu)
         {
             return Table

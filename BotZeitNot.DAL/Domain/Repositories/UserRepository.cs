@@ -1,6 +1,7 @@
 ﻿using BotZeitNot.DAL.Domain.Entity;
 using BotZeitNot.DAL.Domain.Repositories.SpecificStorage;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -37,7 +38,7 @@ namespace BotZeitNot.DAL.Domain.Repositories
 
         public void AddRangeNewSubSeries(long[] chatIdArray, string titleRu)
         {
-            List<SubscriptionSeries> episodes = chatIdArray.
+            var episodes = chatIdArray.
                 Select(c => new SubscriptionSeries
                 {
                     ChatId = c,
@@ -54,12 +55,13 @@ namespace BotZeitNot.DAL.Domain.Repositories
                 {
                     users.Add(user);
                 }
-                //else
-                //{
-
-                //}
             }
             Table.AddRange(users);
+        }
+
+        public object GetUserAndSeriesByTelegramId(object id)
+        {
+            throw new NotImplementedException();
         }
     }
 

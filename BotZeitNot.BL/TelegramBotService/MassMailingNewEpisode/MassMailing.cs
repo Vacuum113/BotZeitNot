@@ -1,4 +1,5 @@
 ﻿using BotZeitNot.DAL;
+using BotZeitNot.DAL.Domain.Entity;
 using BotZeitNot.DAL.Domain.Repositories;
 using BotZeitNot.Domain.Interface;
 using BotZeitNot.Shared.Dto;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
+using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 
 namespace BotZeitNot.BL.TelegramBotService.MassMailingNewEpisode
@@ -16,6 +18,7 @@ namespace BotZeitNot.BL.TelegramBotService.MassMailingNewEpisode
     {
         private UserRepository _userRepository;
         private SubSeriesRepository _subSeriesRepository;
+        private SeriesRepository _seriesRepository;
         private IUnitOfWorkFactory _unitOfWorkFactory;
         private TelegramBotClient _client;
 
@@ -24,6 +27,7 @@ namespace BotZeitNot.BL.TelegramBotService.MassMailingNewEpisode
             _unitOfWorkFactory = unitOfWorkFactory;
             _userRepository = ((UnitOfWork)unitOfWorkFactory.Create()).Users;
             _subSeriesRepository = ((UnitOfWork)unitOfWorkFactory.Create()).SubSeries;
+            _seriesRepository = ((UnitOfWork)unitOfWorkFactory.Create()).Series;
             _client = client;
         }
 
@@ -33,7 +37,22 @@ namespace BotZeitNot.BL.TelegramBotService.MassMailingNewEpisode
             {
                 foreach (var episode in episodes)
                 {
-                    Queue<long> chatIdQueue = MakeQueueChatId(episode.TitleRu);
+                    if(_seriesRepository.GetByNameRuSeries(episode.TitleSeries) == default)
+                    {
+                        string seriesLink = episode.Link.Split("season")[0] + "seasons";
+
+                        _seriesRepository.Add(new Series
+                        {
+                            IsCompleted = false,
+                            NameEn = episode.TitleSeriesEn,
+                            Link = seriesLink,
+                            NameRu = episode.TitleSeries,
+                            SeasonsCount = episode.NumberSeason
+                        });
+                        continue;
+                    }
+
+                    Queue<long> chatIdQueue = MakeQueueChatId(episode.TitleSeries);
 
                     int countRequests = 0;
 
@@ -47,7 +66,7 @@ namespace BotZeitNot.BL.TelegramBotService.MassMailingNewEpisode
                             Select(c => c).
                             ToArray();
 
-                        _userRepository.AddRangeNewSubSeries(chatIdArray, episode.TitleRu);
+                        _userRepository.AddRangeNewSubSeries(chatIdArray, episode.TitleSeries);
                     }
                 }
                 unitOfWork.Save();

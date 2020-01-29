@@ -1,6 +1,8 @@
 ﻿using BotZeitNot.DAL;
 using BotZeitNot.DAL.Domain.Repositories;
 using BotZeitNot.Domain.Interface;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,20 +21,31 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
         private UserRepository _userRepository;
         private TelegramBotClient _client;
         private Message _message;
+        private ILogger<CancelCommand> _logger;
 
         public CancelCommand(IUnitOfWorkFactory unitOfWorkFactory)
         {
             _userRepository = ((UnitOfWork)unitOfWorkFactory.Create()).Users;
+
+            var loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder.AddConsole();
+                builder.AddDebug();
+            });
+            _logger = loggerFactory.CreateLogger<CancelCommand>();
         }
 
         public async override Task Execute(Message message, TelegramBotClient client)
         {
+            _logger.LogInformation($"Time: {DateTime.UtcNow}. Execute cancel command.");
+
             _client = client;
             _message = message;
 
             var user = _userRepository.GetUserAndSeriesByTelegramId(message.From.Id);
-            if (CheckUser(user).Result)
+            if (!IsUserValid(user).Result)
             {
+                _logger.LogWarning($"Time: {DateTime.UtcNow}. User not found.");
                 return;
             }
 
@@ -40,8 +53,9 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
                 .Select(s => s.SeriesNameRu)
                 .ToList();
 
-            if (CheckSubSeries(series).Result)
+            if (!IsSubSeriesValid(series).Result)
             {
+                _logger.LogInformation($"Time: {DateTime.UtcNow}. User subscription series not found.");
                 return;
             }
 
@@ -49,7 +63,7 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
         }
 
 
-        private async Task<bool> CheckUser(User user)
+        private async Task<bool> IsUserValid(User user)
         {
             if (user == default)
             {
@@ -57,12 +71,12 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
                                       "попробуйте начать с команды /start";
 
                 await _client.SendTextMessageAsync(_message.Chat.Id, errorMessage);
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
 
-        private async Task<bool> CheckSubSeries(List<string> series)
+        private async Task<bool> IsSubSeriesValid(List<string> series)
         {
             if (series == null || series.Count == 0)
             {
@@ -71,9 +85,9 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
                                       "можно с помощью команды /search";
 
                 await _client.SendTextMessageAsync(_message.Chat.Id, errorMessage);
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
 
         private async Task SendCancelButtons(List<string> series)

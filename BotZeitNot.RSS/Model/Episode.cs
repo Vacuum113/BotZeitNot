@@ -10,6 +10,8 @@ namespace BotZeitNot.RSS.Model
 
         public string TitleRu { get; set; }
 
+        public string TitleSeriesEn { get; set; }
+
         public string TitleSeries { get; set; }
 
         public string Rating { get; set; }
@@ -36,6 +38,7 @@ namespace BotZeitNot.RSS.Model
                    Number == episode.Number &&
                    NumberSeason == episode.NumberSeason &&
                    TitleRu == episode.TitleRu &&
+                   TitleSeriesEn == episode.TitleSeriesEn &&
                    TitleSeries == episode.TitleSeries &&
                    Rating == episode.Rating &&
                    Link == episode.Link;
@@ -43,7 +46,7 @@ namespace BotZeitNot.RSS.Model
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Number, NumberSeason, TitleRu, TitleSeries, Rating, Link);
+            return HashCode.Combine(Number, NumberSeason, TitleRu, TitleSeriesEn, TitleSeries, Rating, Link);
         }
     }
 }

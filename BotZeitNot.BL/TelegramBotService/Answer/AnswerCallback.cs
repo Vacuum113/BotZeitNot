@@ -2,6 +2,7 @@
 using BotZeitNot.DAL;
 using BotZeitNot.DAL.Domain.Repositories;
 using BotZeitNot.Domain.Interface;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ namespace BotZeitNot.BL.TelegramBotService.Answer
         private CallbackQuery _callbackQuery;
         private IUnitOfWorkFactory _unitOfWorkFactory;
         private TelegramBotClient _client;
+        private ILogger<AnswerCallback> _logger;
 
         public AnswerCallback
             (
@@ -27,13 +29,23 @@ namespace BotZeitNot.BL.TelegramBotService.Answer
             _callbackQuery = callbackQuery;
             _unitOfWorkFactory = unitOfWorkFactory;
             _client = client;
+
+            var loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder.AddConsole();
+                builder.AddDebug();
+            });
+            _logger = loggerFactory.CreateLogger<AnswerCallback>();
         }
 
 
         public async Task Cancel()
         {
+            _logger.LogInformation($"Time: {DateTime.UtcNow}. AnswerCallback Cancel method.");
+
             long chatId = _callbackQuery.Message.Chat.Id;
             string nameRu = _callbackQuery.Data.Split("/")[1];
+            
 
             using (IUnitOfWork unitOfWork = _unitOfWorkFactory.Create())
             {
@@ -42,8 +54,9 @@ namespace BotZeitNot.BL.TelegramBotService.Answer
 
                 var user = userRepository.GetUserAndSeriesByTelegramId(_callbackQuery.From.Id);
 
-                if (CheckUserForEmpty(user).Result)
+                if (!IsUserValid(user).Result)
                 {
+                    _logger.LogWarning($"Time: {DateTime.UtcNow}. User is null.");
                     return;
                 }
 
@@ -53,6 +66,12 @@ namespace BotZeitNot.BL.TelegramBotService.Answer
 
                 if (userSeries == default)
                 {
+                    _logger.LogWarning
+                        (
+                        $"Time: {DateTime.UtcNow}. " +
+                        $"The user has already unsubscribed from the series."
+                        );
+
                     string errorMessage = $"Вы уже отписались от рассылки сериала - {nameRu}";
 
                     await MessageToTelegram.SendCallBackMessageTelegram(_callbackQuery, errorMessage, _client);
@@ -61,7 +80,6 @@ namespace BotZeitNot.BL.TelegramBotService.Answer
 
                 subSeriesRepository.CancelSubscription(user.ChatId, nameRu);
                 unitOfWork.Save();
-
             }
 
             var newSeriesMessage = _callbackQuery.From.FirstName +
@@ -84,7 +102,7 @@ namespace BotZeitNot.BL.TelegramBotService.Answer
 
                 var user = userRepository.GetUserAndSeriesByTelegramId(_callbackQuery.From.Id);
 
-                if (CheckUserForEmpty(user).Result)
+                if (!IsUserValid(user).Result)
                 {
                     return;
                 }
@@ -106,15 +124,15 @@ namespace BotZeitNot.BL.TelegramBotService.Answer
                 userRepository.SubscriprionOnSeries(series, user);
                 unitOfWork.Save();
             }
+
             var newSeriesMessage = _callbackQuery.From.FirstName +
                    ", Вы подписались на новые серии: " +
                    _callbackQuery.Data.Split("/")[1];
 
             await MessageToTelegram.SendCallBackMessageTelegram(_callbackQuery, newSeriesMessage, _client);
-
         }
 
-        private async Task<bool> CheckUserForEmpty(User user)
+        private async Task<bool> IsUserValid(User user)
         {
             if (user == default)
             {
@@ -122,9 +140,9 @@ namespace BotZeitNot.BL.TelegramBotService.Answer
                                       "попробуйте начать с команды /start";
 
                 await MessageToTelegram.SendCallBackMessageTelegram(_callbackQuery, errorMessage, _client);
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
     }
 }

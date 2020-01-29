@@ -29,24 +29,9 @@ namespace BotZeitNot.RSS
 
         private string _botUrl;
 
-        private HttpClientHandler _clientHandler;
-
         public Exporter(Settings settings)
         {
             _botUrl = settings.BotUrl;
-
-            IWebProxy proxy = new HttpToSocks5Proxy
-                (
-                settings.SocksIP,
-                settings.SocksPort,
-                settings.SocksUser,
-                settings.SocksPassword
-                );
-
-            _clientHandler = new HttpClientHandler()
-            {
-                Proxy = proxy
-            };
         }
 
         public bool Export(List<Episode> episodes, List<Episode> prevEpisodes)
@@ -58,7 +43,7 @@ namespace BotZeitNot.RSS
 
             episodes = IsolatingDifference(episodes, prevEpisodes);
 
-            using (HttpClient client = new HttpClient(_clientHandler, disposeHandler: true))
+            using (HttpClient client = new HttpClient())
             {
                 string jsonEpisodes = JsonSerializer.Serialize(episodes);
 
