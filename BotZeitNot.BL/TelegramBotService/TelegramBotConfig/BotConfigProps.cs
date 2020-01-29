@@ -11,5 +11,7 @@
         public string SocksPassword { get; set; }
 
         public string Token { get; set; }
+
+        public string IPToWebHooks { get; set; }
     }
 }

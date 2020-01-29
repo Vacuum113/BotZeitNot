@@ -30,7 +30,7 @@ namespace BotZeitNot.Api
 
             Bot bot = new Bot(configBot.Token);
 
-            bot.Run("51.144.241.128:443/Update/GetUpdate");
+            bot.Run(configBot.IPToWebHooks + ":443/Update/GetUpdate");
 
             services.AddSingleton(servicesProvider =>
             {
