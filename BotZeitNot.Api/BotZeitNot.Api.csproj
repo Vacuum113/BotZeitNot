@@ -21,8 +21,8 @@
 
 
   <ItemGroup>
-    <None Update="YOURPUBLIC.pem">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Update="public.pem">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
