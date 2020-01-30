@@ -31,7 +31,7 @@ namespace BotZeitNot.Api
 
             Bot bot = new Bot(configBot.Token);
 
-            bot.Run(configBot.IPToWebHooks + ":443/Update/GetUpdate");
+            bot.Run("https://" + configBot.IPToWebHooks + "/Update/GetUpdate");
 
             services.AddSingleton(servicesProvider =>
             {

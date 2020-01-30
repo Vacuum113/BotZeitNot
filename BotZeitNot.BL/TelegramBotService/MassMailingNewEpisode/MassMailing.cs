@@ -16,7 +16,6 @@ namespace BotZeitNot.BL.TelegramBotService.MassMailingNewEpisode
 {
     public class MassMailing
     {
-        private UserRepository _userRepository;
         private SubSeriesRepository _subSeriesRepository;
         private SeriesRepository _seriesRepository;
         private IUnitOfWorkFactory _unitOfWorkFactory;
@@ -25,7 +24,6 @@ namespace BotZeitNot.BL.TelegramBotService.MassMailingNewEpisode
         public MassMailing(IUnitOfWorkFactory unitOfWorkFactory, TelegramBotClient client)
         {
             _unitOfWorkFactory = unitOfWorkFactory;
-            _userRepository = ((UnitOfWork)unitOfWorkFactory.Create()).Users;
             _subSeriesRepository = ((UnitOfWork)unitOfWorkFactory.Create()).SubSeries;
             _seriesRepository = ((UnitOfWork)unitOfWorkFactory.Create()).Series;
             _client = client;
@@ -33,43 +31,39 @@ namespace BotZeitNot.BL.TelegramBotService.MassMailingNewEpisode
 
         public void SendingNewSeries(IEnumerable<EpisodeDto> episodes)
         {
-            using (IUnitOfWork unitOfWork = _unitOfWorkFactory.Create())
+            foreach (var episode in episodes)
             {
-                foreach (var episode in episodes)
+                if (_seriesRepository.GetByNameRuSeries(episode.TitleSeries) == default)
                 {
-                    if(_seriesRepository.GetByNameRuSeries(episode.TitleSeries) == default)
+                    string seriesLink = episode.Link.Split("season")[0] + "seasons";
+
+                    _seriesRepository.Add(new Series
                     {
-                        string seriesLink = episode.Link.Split("season")[0] + "seasons";
+                        IsCompleted = false,
+                        NameEn = episode.TitleSeriesEn,
+                        Link = seriesLink,
+                        NameRu = episode.TitleSeries,
+                        SeasonsCount = episode.NumberSeason
+                    });
+                    continue;
+                }
 
-                        _seriesRepository.Add(new Series
-                        {
-                            IsCompleted = false,
-                            NameEn = episode.TitleSeriesEn,
-                            Link = seriesLink,
-                            NameRu = episode.TitleSeries,
-                            SeasonsCount = episode.NumberSeason
-                        });
-                        continue;
-                    }
+                Queue<long> chatIdQueue = MakeQueueChatId(episode.TitleSeries);
 
-                    Queue<long> chatIdQueue = MakeQueueChatId(episode.TitleSeries);
+                int countRequests = 0;
 
-                    int countRequests = 0;
+                while (chatIdQueue.Count != 0)
+                {
+                    long chatId = chatIdQueue.Dequeue();
 
-                    while (chatIdQueue.Count != 0)
+                    countRequests = SendNewEpisode(countRequests, episode, chatId).Result;
+
+                    if (countRequests >= 20)
                     {
-                        long chatId = chatIdQueue.Peek();
-
-                        countRequests = SendNewEpisode(countRequests, episode, chatId).Result;
-
-                        long[] chatIdArray = chatIdQueue.
-                            Select(c => c).
-                            ToArray();
-
-                        _userRepository.AddRangeNewSubSeries(chatIdArray, episode.TitleSeries);
+                        Thread.Sleep(TimeSpan.FromSeconds(1));
+                        countRequests = 0;
                     }
                 }
-                unitOfWork.Save();
             }
         }
 

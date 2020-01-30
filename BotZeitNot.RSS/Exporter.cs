@@ -43,6 +43,11 @@ namespace BotZeitNot.RSS
 
             episodes = IsolatingDifference(episodes, prevEpisodes);
 
+            if(episodes.Count == 0)
+            {
+                return true;
+            }
+
             using (HttpClient client = new HttpClient())
             {
                 string jsonEpisodes = JsonSerializer.Serialize(episodes);

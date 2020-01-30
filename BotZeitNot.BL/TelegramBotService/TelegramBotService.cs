@@ -57,6 +57,9 @@ namespace BotZeitNot.BL.TelegramBotService
                     case UpdateType.CallbackQuery:
                         await IfCAllbackQuery(update);
                         break;
+                    case UpdateType.EditedMessage:
+                        await IfMessage(update.EditedMessage);
+                        break;
                     default:
                         await Default(update);
                         break;

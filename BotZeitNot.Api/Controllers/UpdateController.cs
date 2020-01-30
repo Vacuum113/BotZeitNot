@@ -2,6 +2,7 @@
 using BotZeitNot.Shared.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using Telegram.Bot.Types;
 
@@ -25,16 +26,21 @@ namespace BotZeitNot.Api.Controllers
         public IActionResult Post(Update update)
         {
             _botService.Run(update);
-
             return Ok();
         }
 
         [HttpPost("NewEpisodes")]
         public IActionResult Post(IEnumerable<EpisodeDto> episodes)
         {
-            _botService.SendingNewSeries(episodes);
-
-            return Ok();
+            try
+            {
+                _botService.SendingNewSeries(episodes);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }
