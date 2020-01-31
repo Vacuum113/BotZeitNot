@@ -6,7 +6,7 @@ using Telegram.Bot.Types;
 
 namespace BotZeitNot.BL.TelegramBotService
 {
-    public interface ITelegramBotService : IService
+    public interface ITelegramBotService
     {
         Task Run(Update update);
         void SendingNewSeries(IEnumerable<EpisodeDto> episodes);

@@ -5,11 +5,9 @@ using BotZeitNot.Domain.Interface;
 using BotZeitNot.Shared.Dto;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
-using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 
 namespace BotZeitNot.BL.TelegramBotService.MassMailingNewEpisode

@@ -1,9 +1,7 @@
 ﻿using BotZeitNot.RSS.Model;
 using Microsoft.Extensions.Logging;
-using MihaZupan;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -54,7 +52,7 @@ namespace BotZeitNot.RSS
 
             episodes = IsolatingDifference(episodes, prevEpisodes);
 
-            if(episodes.Count == 0)
+            if (episodes.Count == 0)
             {
                 _logger.LogInformation($"Time: {DateTime.UtcNow}. Difference is 0");
                 return true;
@@ -64,12 +62,10 @@ namespace BotZeitNot.RSS
             {
                 string jsonEpisodes = JsonSerializer.Serialize(episodes);
                 var content = new StringContent(jsonEpisodes, Encoding.UTF8, "application/json");
-                //var result = client.PostAsync(_botUrl, content).Result;
+                var result = client.PostAsync(_botUrl, content).Result;
 
-                //_logger.LogInformation($"Time: {DateTime.UtcNow}. Status code is {result.StatusCode}");
-
-                //return result.IsSuccessStatusCode ? true : false;
-                return true;
+                _logger.LogInformation($"Time: {DateTime.UtcNow}. Status code is {result.StatusCode}");
+                return result.IsSuccessStatusCode ? true : false;
             }
         }
 

@@ -58,11 +58,5 @@ namespace BotZeitNot.DAL.Domain.Repositories
             }
             Table.AddRange(users);
         }
-
-        public object GetUserAndSeriesByTelegramId(object id)
-        {
-            throw new NotImplementedException();
-        }
     }
-
 }

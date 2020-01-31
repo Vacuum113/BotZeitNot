@@ -1,6 +1,5 @@
 ﻿using BotZeitNot.DAL.Domain.Entity;
 using BotZeitNot.DAL.Domain.Repositories.SpecificStorage;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +15,7 @@ namespace BotZeitNot.DAL.Domain.Repositories
 
         public IEnumerable<Series> GetByNameAllMatchSeries(string name)
         {
-            Expression<Func<Series, bool>> predicate = a => (a.NameRu == name ||
-                                                             a.NameEn == name);
+            Expression<Func<Series, bool>> predicate = a => (a.NameRu.StartsWith(name) || a.NameEn.StartsWith(name));
 
             return Table.
                 Where(predicate).

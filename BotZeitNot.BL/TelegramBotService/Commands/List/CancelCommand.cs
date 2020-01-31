@@ -18,14 +18,14 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
         public override string Name => "/cancel";
 
 
-        private UserRepository _userRepository;
+        private SubSeriesRepository _subSeriesRepository;
         private TelegramBotClient _client;
         private Message _message;
         private ILogger<CancelCommand> _logger;
 
         public CancelCommand(IUnitOfWorkFactory unitOfWorkFactory)
         {
-            _userRepository = ((UnitOfWork)unitOfWorkFactory.Create()).Users;
+            _subSeriesRepository = ((UnitOfWork)unitOfWorkFactory.Create()).SubSeries;
 
             var loggerFactory = LoggerFactory.Create(builder =>
             {
@@ -35,6 +35,7 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
             _logger = loggerFactory.CreateLogger<CancelCommand>();
         }
 
+
         public async override Task Execute(Message message, TelegramBotClient client)
         {
             _logger.LogInformation($"Time: {DateTime.UtcNow}. Execute cancel command.");
@@ -42,16 +43,8 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
             _client = client;
             _message = message;
 
-            var user = _userRepository.GetUserAndSeriesByTelegramId(message.From.Id);
-            if (!IsUserValid(user).Result)
-            {
-                _logger.LogWarning($"Time: {DateTime.UtcNow}. User not found.");
-                return;
-            }
 
-            List<string> series = user.SubscriptionSeries
-                .Select(s => s.SeriesNameRu)
-                .ToList();
+            List<string> series = _subSeriesRepository.GetAllSeriesNameByChatId(message.Chat.Id).ToList();
 
             if (!IsSubSeriesValid(series).Result)
             {
@@ -63,7 +56,6 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
 
             await SendCancelButtons(buttons);
         }
-
 
 
         private async Task<bool> IsUserValid(User user)

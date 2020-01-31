@@ -1,5 +1,4 @@
 ﻿using BotZeitNot.Domain.Base;
-using System.Collections.Generic;
 
 namespace BotZeitNot.DAL.Domain.Entity
 {

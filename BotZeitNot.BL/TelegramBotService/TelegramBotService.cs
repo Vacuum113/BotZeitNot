@@ -65,7 +65,7 @@ namespace BotZeitNot.BL.TelegramBotService
                         break;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"Time: {DateTime.UtcNow}. Catch error in method - 'Run'. Error message: " + ex.Message);
             }
