@@ -3,7 +3,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Xml;
 
@@ -33,8 +35,15 @@ namespace BotZeitNot.RSS
             List<Episode> listEpisodes;
             List<Episode> listEpisodesPrev = new List<Episode>();
 
-            _logger.LogInformation($"Time: {DateTime.UtcNow}. Start program");
+            using (FileStream fileStream = new FileStream("pervEpisodes.json", FileMode.OpenOrCreate))
+            {
+                if (fileStream.Length != 0)
+                {
+                    listEpisodesPrev = JsonSerializer.DeserializeAsync<List<Episode>>(fileStream).Result;
+                }
+            }
 
+            _logger.LogInformation($"Time: {DateTime.UtcNow}. Start program");
             while (true)
             {
                 try
@@ -67,16 +76,22 @@ namespace BotZeitNot.RSS
 
                         Thread.Sleep(TimeSpan.FromMinutes(2));
                     }
-
                     listEpisodesPrev = listEpisodes;
 
+                    File.WriteAllText("pervEpisodes.json", string.Empty);
+                    using (FileStream fileStream = new FileStream("pervEpisodes.json", FileMode.OpenOrCreate))
+                    {
+                        JsonSerializer.SerializeAsync(fileStream, listEpisodesPrev);
+                    }
+
                     _logger.LogInformation($"Time: {DateTime.UtcNow}. Sleep. After export new episodes.");
+
                     Thread.Sleep(TimeSpan.FromMinutes(7));
                 }
                 catch (Exception ex)
                 {
-                    Thread.Sleep(TimeSpan.FromMinutes(2));
                     _logger.LogError(ex, $"Time: { DateTime.UtcNow}. Catch error in method - 'Program'.Error message: " + ex.Message);
+                    Thread.Sleep(TimeSpan.FromMinutes(2));
                 }
             }
 

@@ -64,11 +64,12 @@ namespace BotZeitNot.RSS
             {
                 string jsonEpisodes = JsonSerializer.Serialize(episodes);
                 var content = new StringContent(jsonEpisodes, Encoding.UTF8, "application/json");
-                var result = client.PostAsync(_botUrl, content).Result;
+                //var result = client.PostAsync(_botUrl, content).Result;
 
-                _logger.LogInformation($"Time: {DateTime.UtcNow}. Status code is {result.StatusCode}");
+                //_logger.LogInformation($"Time: {DateTime.UtcNow}. Status code is {result.StatusCode}");
 
-                return result.IsSuccessStatusCode ? true : false;
+                //return result.IsSuccessStatusCode ? true : false;
+                return true;
             }
         }
 
