@@ -69,8 +69,11 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
                 return;
             }
 
+            int countSeries = series.
+                FindAll(s => s.IsCompleted == true).
+                Count;
 
-            if (series.FindAll(s => s.IsCompleted == true).Count != 0)
+            if (countSeries != 0)
             {
                 var completedSeries = new StringBuilder();
                 completedSeries.Append("Серилал(ы) завершившийся(еся):\n");

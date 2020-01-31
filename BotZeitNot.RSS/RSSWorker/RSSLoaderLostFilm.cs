@@ -1,4 +1,6 @@
-﻿using MihaZupan;
+﻿using Microsoft.Extensions.Logging;
+using MihaZupan;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -11,14 +13,24 @@ namespace BotZeitNot.RSS
     public class RSSLoaderLostFilm
     {
         private string _loadingString;
+        private ILogger<RSSLoaderLostFilm> _logger;
 
         public RSSLoaderLostFilm(Settings settings)
         {
             _loadingString = settings.LostFilmRSSLink;
+
+            var loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder.AddConsole();
+                builder.AddDebug();
+            });
+            _logger = loggerFactory.CreateLogger<RSSLoaderLostFilm>();
         }
 
         public async Task<XmlReader> LoadFromRSS()
         {
+            _logger.LogInformation($"Time: {DateTime.UtcNow}. Start method loader rss");
+
 
             string rssString;
             using (HttpClient client = new HttpClient())

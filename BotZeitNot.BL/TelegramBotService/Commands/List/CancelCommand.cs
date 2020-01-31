@@ -59,8 +59,11 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
                 return;
             }
 
-            await SendCancelButtons(series);
+            var buttons = MakeInlineKeyboardButtons(series);
+
+            await SendCancelButtons(buttons);
         }
+
 
 
         private async Task<bool> IsUserValid(User user)
@@ -90,16 +93,46 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
             return true;
         }
 
-        private async Task SendCancelButtons(List<string> series)
+        private List<List<InlineKeyboardButton>> MakeInlineKeyboardButtons(List<string> series)
+        {
+            List<InlineKeyboardButton> buttonsList = series.
+                Select(s => new InlineKeyboardButton()
+                {
+                    Text = s,
+                    CallbackData = "Cancel/" + s
+                }).
+                ToList();
+
+
+            var buttonsKeyboard = new List<List<InlineKeyboardButton>>();
+            List<InlineKeyboardButton> localList = new List<InlineKeyboardButton>();
+
+            foreach (var item in buttonsList)
+            {
+                localList.Add(item);
+                if (localList.Count == 2)
+                {
+                    buttonsKeyboard.Add(localList);
+                    localList.RemoveRange(0, 2);
+                }
+            }
+
+            buttonsKeyboard.Add(new List<InlineKeyboardButton>
+            {
+                new InlineKeyboardButton
+                {
+                    Text = "Cancel All",
+                    CallbackData = "CancelAll"
+                }
+            });
+            return buttonsKeyboard;
+        }
+
+
+        private async Task SendCancelButtons(List<List<InlineKeyboardButton>> buttons)
         {
             string cancelMessage = "Выберите, от рассылки какого " +
                                    "сериала вы хотите отписаться";
-
-            var buttons = series.Select(s => new InlineKeyboardButton()
-            {
-                Text = s,
-                CallbackData = "Cancel/" + s
-            });
 
             await _client.SendTextMessageAsync
                 (

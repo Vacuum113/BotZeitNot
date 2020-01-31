@@ -55,7 +55,7 @@ namespace BotZeitNot.BL.TelegramBotService
                         await IfMessage(update.Message);
                         break;
                     case UpdateType.CallbackQuery:
-                        await IfCAllbackQuery(update);
+                        await IfCAllbackQuery(update.CallbackQuery);
                         break;
                     case UpdateType.EditedMessage:
                         await IfMessage(update.EditedMessage);
@@ -67,7 +67,7 @@ namespace BotZeitNot.BL.TelegramBotService
             }
             catch(Exception ex)
             {
-                _logger.LogError($"Time: {DateTime.UtcNow}. Catch error in method - 'Run'. Error message: " + ex.Message);
+                _logger.LogError(ex, $"Time: {DateTime.UtcNow}. Catch error in method - 'Run'. Error message: " + ex.Message);
             }
         }
 
@@ -79,12 +79,11 @@ namespace BotZeitNot.BL.TelegramBotService
             {
                 try
                 {
-                    new MassMailing(_unitOfWorkFactory, _client)
-                        .SendingNewSeries(episodes);
+                    new MassMailing(_unitOfWorkFactory, _client).SendingNewSeries(episodes);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"Time: {DateTime.UtcNow}. Catch error in method - 'SendingNewSeries'. Error message: " + ex.Message);
+                    _logger.LogError(ex, $"Time: {DateTime.UtcNow}. Catch error in method - 'SendingNewSeries'. Error message: " + ex.Message);
                 }
             }
             else
@@ -97,62 +96,44 @@ namespace BotZeitNot.BL.TelegramBotService
         private async Task IfMessage(Message message)
         {
             _logger.LogInformation($"Time: {DateTime.UtcNow}. If message type method.");
-            if (
-                message != null &&
-                !message.From.IsBot &&
-                message.Text != null &&
-                message.Text.StartsWith('/')
-                )
+
+
+            bool messageNotNullAndIsNotBot = message != null && !message.From.IsBot;
+            if (messageNotNullAndIsNotBot && message.Text != null)
             {
                 Command command = _commandList.GetCommand(message.Text);
-                if (command != null)
+                bool isCommandNotNullAndIsMessageValid = command != null && message.Text.StartsWith('/');
+
+                if (isCommandNotNullAndIsMessageValid)
                 {
                     await command.Execute(message, _client);
                 }
                 else
                 {
-                    const string helpString = "Для просмотра списка команд " +
-                                              "- отправте сообщение: \"/help\"\n " +
-                                              "или напишите \"/\" для " +
-                                              "просмотра доступных команд.";
+                    string helpString = "Для просмотра списка команд - отправте сообщение: \"/help\"\n " +
+                                        "или напишите \"/\" для просмотра доступных команд.";
 
                     await _client.SendTextMessageAsync(message.Chat.Id, helpString);
                 }
             }
             else
             {
-                if (message == null)
-                {
-                    _logger.LogWarning($"Time: {DateTime.UtcNow}. Empty \"Message\" obj.");
-                }
-                else if (message.From.IsBot)
-                {
-                    _logger.LogWarning($"Time: {DateTime.UtcNow}. Message from Bot.");
-                }
-                else if (message.Text == null)
-                {
-                    _logger.LogWarning($"Time: {DateTime.UtcNow}. Message text is null.");
-                }
-                else 
-                {
-                    _logger.LogWarning($"Time: {DateTime.UtcNow}. Wrong message text: {message.Text}.");
-                }
+                _logger.LogWarning($"Time: {DateTime.UtcNow}. Some problems with Message obj: " + message);
                 return;
             }
         }
 
-        private async Task IfCAllbackQuery(Update update)
+        private async Task IfCAllbackQuery(CallbackQuery callbackQuery)
         {
             _logger.LogInformation($"Time: {DateTime.UtcNow}. If callbackquery type method.");
 
-            if (
-                update.CallbackQuery != null &&
-                !update.CallbackQuery.From.IsBot &&
-                update.CallbackQuery.Message != null
-                )
+
+            bool callbackNotNullAndIsNotFromBot = callbackQuery != null && !callbackQuery.From.IsBot;
+
+            if (callbackNotNullAndIsNotFromBot && callbackQuery.Message != null)
             {
-                var answerCallback = new AnswerCallback(update.CallbackQuery, _unitOfWorkFactory, _client);
-                switch (update.CallbackQuery.Data.Split("/")[0])
+                var answerCallback = new AnswerCallback(callbackQuery, _unitOfWorkFactory, _client);
+                switch (callbackQuery.Data.Split("/")[0])
                 {
                     case "Search":
                         await answerCallback
@@ -167,18 +148,7 @@ namespace BotZeitNot.BL.TelegramBotService
             }
             else
             {
-                if (update.CallbackQuery == null)
-                {
-                    _logger.LogWarning($"Time: {DateTime.UtcNow}. Empty \"CallbackQuery\" obj.");
-                }
-                else if (update.CallbackQuery.From.IsBot)
-                {
-                    _logger.LogWarning($"Time: {DateTime.UtcNow}. Message from Bot.");
-                }
-                else if (update.CallbackQuery.Message == null)
-                {
-                    _logger.LogWarning($"Time: {DateTime.UtcNow}. Message is null.");
-                }
+                _logger.LogWarning($"Time: {DateTime.UtcNow}. Some problems with CallbackQuery obj: " + callbackQuery);
                 return;
             }
         }
@@ -188,12 +158,40 @@ namespace BotZeitNot.BL.TelegramBotService
         {
             _logger.LogInformation($"Time: {DateTime.UtcNow}. Default response method.");
 
-            const string defaultString = "Извините, не понял вас.\n" +
-                                         "Для просмотра списка команд - " +
-                                         "отправте сообщение: \"/help\"\n " +
-                                         "или напишите \"/\" для просмотра доступных команд.";
+            string defaultString = "Извините, не понял вас.\nДля просмотра списка команд - " +
+                                   "отправте сообщение: \"/help\"\n или напишите \"/\" " +
+                                   "для просмотра доступных команд.";
 
-            await _client.SendTextMessageAsync(update.Message.Chat.Id, defaultString);
+            switch (update.Type)
+            {
+                case UpdateType.EditedMessage:
+                    await _client.SendTextMessageAsync(update.EditedMessage.From.Id, defaultString);
+                    break;
+                case UpdateType.Message:
+                    await _client.SendTextMessageAsync(update.Message.From.Id, defaultString);
+                    break;
+                case UpdateType.InlineQuery:
+                    await _client.SendTextMessageAsync(update.InlineQuery.From.Id, defaultString);
+                    break;
+                case UpdateType.EditedChannelPost:
+                    await _client.SendTextMessageAsync(update.EditedChannelPost.From.Id, defaultString);
+                    break;
+                case UpdateType.ChannelPost:
+                    await _client.SendTextMessageAsync(update.ChannelPost.From.Id, defaultString);
+                    break;
+                case UpdateType.CallbackQuery:
+                    await _client.SendTextMessageAsync(update.CallbackQuery.From.Id, defaultString);
+                    break;
+                case UpdateType.ChosenInlineResult:
+                    await _client.SendTextMessageAsync(update.ChosenInlineResult.From.Id, defaultString);
+                    break;
+                case UpdateType.PreCheckoutQuery:
+                    await _client.SendTextMessageAsync(update.PreCheckoutQuery.From.Id, defaultString);
+                    break;
+                case UpdateType.ShippingQuery:
+                    await _client.SendTextMessageAsync(update.ShippingQuery.From.Id, defaultString);
+                    break;
+            }
         }
     }
 }

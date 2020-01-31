@@ -1,4 +1,5 @@
 ﻿using BotZeitNot.RSS.Model;
+using Microsoft.Extensions.Logging;
 using MihaZupan;
 using System;
 using System.Collections.Generic;
@@ -28,14 +29,24 @@ namespace BotZeitNot.RSS
         }
 
         private string _botUrl;
+        private ILogger<Exporter> _logger;
 
         public Exporter(Settings settings)
         {
             _botUrl = settings.BotUrl;
+
+            var loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder.AddConsole();
+                builder.AddDebug();
+            });
+            _logger = loggerFactory.CreateLogger<Exporter>();
         }
 
         public bool Export(List<Episode> episodes, List<Episode> prevEpisodes)
         {
+            _logger.LogInformation($"Time: {DateTime.UtcNow}. Start method export");
+
             if (episodes == null) throw new NullReferenceException();
 
             _episodes = episodes;
@@ -45,16 +56,17 @@ namespace BotZeitNot.RSS
 
             if(episodes.Count == 0)
             {
+                _logger.LogInformation($"Time: {DateTime.UtcNow}. Difference is 0");
                 return true;
             }
 
             using (HttpClient client = new HttpClient())
             {
                 string jsonEpisodes = JsonSerializer.Serialize(episodes);
-
                 var content = new StringContent(jsonEpisodes, Encoding.UTF8, "application/json");
-
                 var result = client.PostAsync(_botUrl, content).Result;
+
+                _logger.LogInformation($"Time: {DateTime.UtcNow}. Status code is {result.StatusCode}");
 
                 return result.IsSuccessStatusCode ? true : false;
             }

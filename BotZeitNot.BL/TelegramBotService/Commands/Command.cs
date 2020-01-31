@@ -17,7 +17,7 @@ namespace BotZeitNot.BL.TelegramBotService.Commands
 
         public bool Contains(string message)
         {
-            return message.Equals(this.Name) ? true : false;
+            return message.Equals(this.Name.ToLower()) ? true : false;
         }
     }
 }

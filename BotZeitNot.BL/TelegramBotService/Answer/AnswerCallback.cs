@@ -43,51 +43,54 @@ namespace BotZeitNot.BL.TelegramBotService.Answer
         {
             _logger.LogInformation($"Time: {DateTime.UtcNow}. AnswerCallback Cancel method.");
 
-            long chatId = _callbackQuery.Message.Chat.Id;
-            string nameRu = _callbackQuery.Data.Split("/")[1];
-            
-
-            using (IUnitOfWork unitOfWork = _unitOfWorkFactory.Create())
+            if (_callbackQuery.Data == "CancelAll")
             {
-                SubSeriesRepository subSeriesRepository = ((UnitOfWork)unitOfWork).SubSeries;
-                UserRepository userRepository = ((UnitOfWork)unitOfWork).Users;
-
-                var user = userRepository.GetUserAndSeriesByTelegramId(_callbackQuery.From.Id);
-
-                if (!IsUserValid(user).Result)
+                using (IUnitOfWork unitOfWork = _unitOfWorkFactory.Create())
                 {
-                    _logger.LogWarning($"Time: {DateTime.UtcNow}. User is null.");
-                    return;
+                    SubSeriesRepository subSeriesRepository = ((UnitOfWork)unitOfWork).SubSeries;
+                    UserRepository userRepository = ((UnitOfWork)unitOfWork).Users;
+
+                    subSeriesRepository.CancelSubscriptionFromAll(_callbackQuery.From.Id);
+                    unitOfWork.Save();
                 }
 
-                var userSeries = user.SubscriptionSeries.
-                    Where(s => s.SeriesNameRu == nameRu).
-                    FirstOrDefault();
+                var cancelAllMessage = _callbackQuery.From.FirstName +
+                    ", Вы отписались от рассылки всех сериалов";
 
-                if (userSeries == default)
-                {
-                    _logger.LogWarning
-                        (
-                        $"Time: {DateTime.UtcNow}. " +
-                        $"The user has already unsubscribed from the series."
-                        );
-
-                    string errorMessage = $"Вы уже отписались от рассылки сериала - {nameRu}";
-
-                    await MessageToTelegram.SendCallBackMessageTelegram(_callbackQuery, errorMessage, _client);
-                    return;
-                }
-
-                subSeriesRepository.CancelSubscription(user.ChatId, nameRu);
-                unitOfWork.Save();
+                await MessageToTelegram.SendCallBackMessageTelegram(_callbackQuery, cancelAllMessage, _client);
             }
+            else
+            {
+                using (IUnitOfWork unitOfWork = _unitOfWorkFactory.Create())
+                {
+                    string nameRu = _callbackQuery.Data.Split("/")[1];
+                    SubSeriesRepository subSeriesRepository = ((UnitOfWork)unitOfWork).SubSeries;
+                    UserRepository userRepository = ((UnitOfWork)unitOfWork).Users;
 
-            var newSeriesMessage = _callbackQuery.From.FirstName +
-                   ", Вы отписались от рассылки сериала - " +
-                   _callbackQuery.Data.Split("/")[1];
+                    if (!subSeriesRepository.IsUserSubscribedToSeries(_callbackQuery.From.Id, nameRu))
+                    {
+                        _logger.LogWarning
+                            (
+                            $"Time: {DateTime.UtcNow}. " +
+                            $"The user has already unsubscribed from the series."
+                            );
 
-            await MessageToTelegram.SendCallBackMessageTelegram(_callbackQuery, newSeriesMessage, _client);
+                        string errorMessage = $"Вы уже отписались от рассылки сериала - {nameRu}";
 
+                        await MessageToTelegram.SendCallBackMessageTelegram(_callbackQuery, errorMessage, _client);
+                        return;
+                    }
+
+                    subSeriesRepository.CancelSubscription(_callbackQuery.From.Id, nameRu);
+                    unitOfWork.Save();
+                }
+
+                var cancelSeriesMessage = _callbackQuery.From.FirstName +
+                       ", Вы отписались от рассылки сериала - " +
+                       _callbackQuery.Data.Split("/")[1];
+
+                await MessageToTelegram.SendCallBackMessageTelegram(_callbackQuery, cancelSeriesMessage, _client);
+            }
         }
 
         public async Task Search()
