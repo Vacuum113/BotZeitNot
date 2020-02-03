@@ -27,9 +27,6 @@ namespace BotZeitNot.RSS
 
         public async Task<XmlReader> LoadFromRSS()
         {
-            _logger.LogInformation($"Time: {DateTime.UtcNow}. Start method loader rss");
-
-
             string rssString;
             using (HttpClient client = new HttpClient())
             {

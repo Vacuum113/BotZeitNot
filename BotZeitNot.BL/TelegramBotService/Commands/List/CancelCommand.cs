@@ -21,25 +21,15 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
         private SubSeriesRepository _subSeriesRepository;
         private TelegramBotClient _client;
         private Message _message;
-        private ILogger<CancelCommand> _logger;
 
         public CancelCommand(IUnitOfWorkFactory unitOfWorkFactory)
         {
             _subSeriesRepository = ((UnitOfWork)unitOfWorkFactory.Create()).SubSeries;
-
-            var loggerFactory = LoggerFactory.Create(builder =>
-            {
-                builder.AddConsole();
-                builder.AddDebug();
-            });
-            _logger = loggerFactory.CreateLogger<CancelCommand>();
         }
 
 
         public async override Task Execute(Message message, TelegramBotClient client)
         {
-            _logger.LogInformation($"Time: {DateTime.UtcNow}. Execute cancel command.");
-
             _client = client;
             _message = message;
 
@@ -48,9 +38,8 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
 
             if (!IsSubSeriesValid(series).Result)
             {
-                _logger.LogInformation($"Time: {DateTime.UtcNow}. User subscription series not found.");
                 return;
-            }
+            }   
 
             var buttons = MakeInlineKeyboardButtons(series);
 
@@ -105,8 +94,16 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
                 if (localList.Count == 2)
                 {
                     buttonsKeyboard.Add(localList);
-                    localList.RemoveRange(0, 2);
+                    localList = new List<InlineKeyboardButton>();
                 }
+            }
+
+            if(series.Count % 2 != 0)
+            {
+                buttonsKeyboard.Add(new List<InlineKeyboardButton> 
+                {
+                    buttonsList.LastOrDefault() 
+                });
             }
 
             buttonsKeyboard.Add(new List<InlineKeyboardButton>

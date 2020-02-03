@@ -18,37 +18,22 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
     {
         public override string Name => "/search";
 
-        private readonly IUnitOfWorkFactory _unitOfWorkFactory;
-        private readonly SeriesRepository _seriesRepository;
-
+        private SeriesRepository _seriesRepository;
         private Message _message;
         private TelegramBotClient _client;
-        private ILogger<SearchCommand> _logger;
 
         public SearchCommand(IUnitOfWorkFactory unitOfWorkFactory)
         {
-            _unitOfWorkFactory = unitOfWorkFactory;
             _seriesRepository = ((UnitOfWork)unitOfWorkFactory.Create()).Series;
-
-            var loggerFactory = LoggerFactory.Create(builder =>
-            {
-                builder.AddConsole();
-                builder.AddDebug();
-            });
-            _logger = loggerFactory.CreateLogger<SearchCommand>();
         }
 
         public async override Task Execute(Message message, TelegramBotClient client)
         {
-            _logger.LogInformation($"Time: {DateTime.UtcNow}. Execute search command.");
-
-
             _client = client;
             _message = message;
 
             if (IsTextStringLessThan8Char(_message.Text).Result)
             {
-                _logger.LogInformation($"Time: {DateTime.UtcNow}. Wrong length message text - {_message.Text.Length} < 8.");
                 return;
             }
 
@@ -58,14 +43,12 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
 
             if (!IsNameSeriesValid(text).Result)
             {
-                _logger.LogInformation($"Time: {DateTime.UtcNow}. Wrong or empty series name.");
                 return;
             }
 
             List<Series> series = _seriesRepository.GetByNameAllMatchSeries(text).ToList();
             if (!IsSeriesListValid(series).Result)
             {
-                _logger.LogInformation($"Time: {DateTime.UtcNow}. Series not found.");
                 return;
             }
 

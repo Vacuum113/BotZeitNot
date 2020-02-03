@@ -47,9 +47,6 @@ namespace BotZeitNot.RSS
             {
                 try
                 {
-                    _logger.LogInformation($"Time: {DateTime.UtcNow}. New cycle pass");
-
-
                     xmlReader = new RSSLoaderLostFilm(settings).LoadFromRSS().Result;
 
                     episodesStrings = new RSSParserLostFilm().ParseNamesAndLinks(xmlReader);
@@ -70,9 +67,6 @@ namespace BotZeitNot.RSS
 
                     while (!exporter.Export(listEpisodes, listEpisodesPrev))
                     {
-                        _logger.LogInformation($"Time: {DateTime.UtcNow}. ListEpisodes count - {listEpisodes.Count}. ListEpisodesPrev count - {listEpisodesPrev}");
-                        _logger.LogInformation($"Time: {DateTime.UtcNow}. Sleep. The exporter object returned false");
-
                         Thread.Sleep(TimeSpan.FromMinutes(2));
                     }
                     listEpisodesPrev = listEpisodes;
@@ -82,8 +76,6 @@ namespace BotZeitNot.RSS
                     {
                         JsonSerializer.SerializeAsync(fileStream, listEpisodesPrev);
                     }
-
-                    _logger.LogInformation($"Time: {DateTime.UtcNow}. Sleep. After export new episodes.");
 
                     Thread.Sleep(TimeSpan.FromMinutes(7));
                 }

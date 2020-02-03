@@ -12,5 +12,8 @@ namespace BotZeitNot.DAL.Domain.Repositories.SpecificStorage
 
         public void CancelSubscriptionFromAll(int chatId);
 
-        public bool IsUserSubscribedToSeries(int chatId, string nameRu);
+        public bool IsUserSubscribedToSeries(long chatId, string nameRu);
+
+        public void AddSubscription(long chatId, string nameRu);
+    }
 }

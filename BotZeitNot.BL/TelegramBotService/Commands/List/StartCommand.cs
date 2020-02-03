@@ -15,37 +15,24 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
     {
         public override string Name => "/start";
 
-        private readonly IUnitOfWorkFactory _unitOfWorkFactory;
-        private readonly UserRepository _userRepository;
-
+        private IUnitOfWorkFactory _unitOfWorkFactory;
+        private UserRepository _userRepository;
         private TelegramBotClient _client;
-        private ILogger<StartCommand> _logger;
 
         public StartCommand(IUnitOfWorkFactory unitOfWorkFactory)
         {
             _unitOfWorkFactory = unitOfWorkFactory;
             _userRepository = ((UnitOfWork)unitOfWorkFactory.Create()).Users;
-
-            var loggerFactory = LoggerFactory.Create(builder =>
-            {
-                builder.AddConsole();
-                builder.AddDebug();
-            });
-            _logger = loggerFactory.CreateLogger<StartCommand>();
         }
 
         public async override Task Execute(Message message, TelegramBotClient client)
         {
-            _logger.LogInformation($"Time: {DateTime.UtcNow}. Execute start command.");
-
-
             _client = client;
 
             using (IUnitOfWork unitOfWork = _unitOfWorkFactory.Create())
             {
                 if (IsUserContainsInDb(message).Result)
                 {
-                    _logger.LogInformation($"Time: {DateTime.UtcNow}. User is already contained in Db");
                     return;
                 }
 

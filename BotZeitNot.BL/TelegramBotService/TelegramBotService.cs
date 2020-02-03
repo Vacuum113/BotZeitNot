@@ -39,8 +39,6 @@ namespace BotZeitNot.BL.TelegramBotService
 
         public async Task Run(Update update)
         {
-            _logger.LogInformation($"Time: {DateTime.UtcNow}. Entry to the webhook parsing method.");
-
             if (update == null)
             {
                 _logger.LogWarning($"Time: {DateTime.UtcNow}. Empty \"Update\" obj.");
@@ -73,8 +71,6 @@ namespace BotZeitNot.BL.TelegramBotService
 
         public void SendingNewSeries(IEnumerable<EpisodeDto> episodes)
         {
-            _logger.LogInformation($"Time: {DateTime.UtcNow}. Entry in sending new series method.");
-
             if (episodes != null)
             {
                 try
@@ -95,9 +91,6 @@ namespace BotZeitNot.BL.TelegramBotService
 
         private async Task IfMessage(Message message)
         {
-            _logger.LogInformation($"Time: {DateTime.UtcNow}. If message type method.");
-
-
             bool messageNotNullAndIsNotBot = message != null && !message.From.IsBot;
             if (messageNotNullAndIsNotBot && message.Text != null)
             {
@@ -125,9 +118,6 @@ namespace BotZeitNot.BL.TelegramBotService
 
         private async Task IfCAllbackQuery(CallbackQuery callbackQuery)
         {
-            _logger.LogInformation($"Time: {DateTime.UtcNow}. If callbackquery type method.");
-
-
             bool callbackNotNullAndIsNotFromBot = callbackQuery != null && !callbackQuery.From.IsBot;
 
             if (callbackNotNullAndIsNotFromBot && callbackQuery.Message != null)
@@ -136,13 +126,13 @@ namespace BotZeitNot.BL.TelegramBotService
                 switch (callbackQuery.Data.Split("/")[0])
                 {
                     case "Search":
-                        await answerCallback
-                            .Search();
+                        await answerCallback.Search();
                         break;
-
                     case "Cancel":
-                        await answerCallback
-                            .Cancel();
+                        await answerCallback.Cancel();
+                        break;
+                    case "CancelAll":
+                        await answerCallback.Cancel();
                         break;
                 }
             }
@@ -156,8 +146,6 @@ namespace BotZeitNot.BL.TelegramBotService
 
         private async Task Default(Update update)
         {
-            _logger.LogInformation($"Time: {DateTime.UtcNow}. Default response method.");
-
             string defaultString = "Извините, не понял вас.\nДля просмотра списка команд - " +
                                    "отправте сообщение: \"/help\"\n или напишите \"/\" " +
                                    "для просмотра доступных команд.";

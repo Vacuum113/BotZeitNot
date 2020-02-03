@@ -22,8 +22,6 @@ namespace BotZeitNot.RSS
 
         public List<Tuple<string, string>> ParseNamesAndLinks(XmlReader xmlReader)
         {
-            _logger.LogInformation($"Time: {DateTime.UtcNow}. Start method parser rss");
-
             SyndicationFeed feed = SyndicationFeed.Load(xmlReader);
 
             List<Tuple<string, string>> tuples = new List<Tuple<string, string>>();

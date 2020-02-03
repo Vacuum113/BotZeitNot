@@ -1,7 +1,10 @@
 ﻿using BotZeitNot.DAL.Domain.Entity;
 using BotZeitNot.DAL.Domain.Repositories.SpecificStorage;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace BotZeitNot.DAL.Domain.Repositories
 {
@@ -19,13 +22,8 @@ namespace BotZeitNot.DAL.Domain.Repositories
 
         public void CancelSubscription(long chatId, string seriesNameRu)
         {
-            SubscriptionSeries series = Table.
-                FirstOrDefault
-                (
-                ss =>
-                ss.ChatId == chatId &&
-                ss.SeriesNameRu == seriesNameRu
-                );
+            Expression<Func<SubscriptionSeries, bool>> predicat = ss => ss.ChatId == chatId && ss.SeriesNameRu == seriesNameRu;
+            SubscriptionSeries series = Table.FirstOrDefault(predicat);
 
             Table.Remove(series);
         }
@@ -43,17 +41,25 @@ namespace BotZeitNot.DAL.Domain.Repositories
             Table.RemoveRange(Table.Where(ss => ss.ChatId == chatId));
         }
 
-        public bool IsUserSubscribedToSeries(int chatId, string nameRu)
+        public bool IsUserSubscribedToSeries(long chatId, string nameRu)
         {
-            var subSer = Table.
-                FirstOrDefault
-                (
-                ss =>
-                ss.ChatId == chatId &&
-                ss.SeriesNameRu == nameRu
-                );
+            Expression<Func<SubscriptionSeries, bool>> predicate = ss => ss.ChatId == chatId && ss.SeriesNameRu == nameRu;
+            var subSer = Table.FirstOrDefault(predicate);
 
             return subSer != default ? true : false;
+        }
+
+        public void AddSubscription(long chatId, string nameRu)
+        {
+            User user = _context.Users.
+                Include(u => u.SubscriptionSeries).
+                FirstOrDefault(u=>u.ChatId == chatId);
+
+            user.SubscriptionSeries.Add(new SubscriptionSeries 
+            { 
+                ChatId = chatId, 
+                SeriesNameRu = nameRu 
+            });
         }
     }
 }

@@ -43,8 +43,6 @@ namespace BotZeitNot.RSS
 
         public bool Export(List<Episode> episodes, List<Episode> prevEpisodes)
         {
-            _logger.LogInformation($"Time: {DateTime.UtcNow}. Start method export");
-
             if (episodes == null) throw new NullReferenceException();
 
             _episodes = episodes;
@@ -54,7 +52,6 @@ namespace BotZeitNot.RSS
 
             if (episodes.Count == 0)
             {
-                _logger.LogInformation($"Time: {DateTime.UtcNow}. Difference is 0");
                 return true;
             }
 
@@ -63,8 +60,8 @@ namespace BotZeitNot.RSS
                 string jsonEpisodes = JsonSerializer.Serialize(episodes);
                 var content = new StringContent(jsonEpisodes, Encoding.UTF8, "application/json");
                 var result = client.PostAsync(_botUrl, content).Result;
+                _logger.LogInformation($"Time: { DateTime.UtcNow}. Response: {result.ToString()}");
 
-                _logger.LogInformation($"Time: {DateTime.UtcNow}. Status code is {result.StatusCode}");
                 return result.IsSuccessStatusCode ? true : false;
             }
         }
@@ -87,7 +84,6 @@ namespace BotZeitNot.RSS
             }
 
             return difference;
-
         }
 
     }

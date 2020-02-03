@@ -15,17 +15,18 @@ namespace BotZeitNot.DAL.Domain.Repositories
 
         public IEnumerable<Series> GetByNameAllMatchSeries(string name)
         {
-            Expression<Func<Series, bool>> predicate = a => (a.NameRu.StartsWith(name) || a.NameEn.StartsWith(name));
+            Expression<Func<Series, bool>> predicateRu = a => a.NameRu.ToLower().StartsWith(name.ToLower());
+            Expression<Func<Series, bool>> predicateEn = a => a.NameEn.ToLower().StartsWith(name.ToLower());
 
             return Table.
-                Where(predicate).
+                Where(predicateRu).
+                Where(predicateEn).
                 Take(7);
         }
 
         public Series GetByNameRuSeries(string nameRu)
         {
-            return Table
-                    .FirstOrDefault(s => s.NameRu == nameRu);
+            return Table.FirstOrDefault(s => s.NameRu == nameRu);
         }
     }
 }
