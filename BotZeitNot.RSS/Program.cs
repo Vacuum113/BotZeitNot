@@ -42,7 +42,6 @@ namespace BotZeitNot.RSS
                 }
             }
 
-            _logger.LogInformation($"Time: {DateTime.UtcNow}. Start program");
             while (true)
             {
                 try

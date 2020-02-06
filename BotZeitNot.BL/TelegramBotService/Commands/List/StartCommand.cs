@@ -40,8 +40,8 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
                 {
                     ChatId = message.Chat.Id,
                     TelegramId = message.From.Id,
-                    FirstName = message.From.FirstName ?? null,
-                    UserName = message.From.Username,
+                    FirstName = message.From.FirstName,
+                    UserName = message.From.Username ?? null,
                     LastName = message.From.LastName ?? null
                 });
 

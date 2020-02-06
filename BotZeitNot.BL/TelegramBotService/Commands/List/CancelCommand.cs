@@ -47,19 +47,6 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
         }
 
 
-        private async Task<bool> IsUserValid(User user)
-        {
-            if (user == default)
-            {
-                string errorMessage = "Пользователь не найден, " +
-                                      "попробуйте начать с команды /start";
-
-                await _client.SendTextMessageAsync(_message.Chat.Id, errorMessage);
-                return false;
-            }
-            return true;
-        }
-
         private async Task<bool> IsSubSeriesValid(List<string> series)
         {
             if (series == null || series.Count == 0)

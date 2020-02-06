@@ -105,18 +105,5 @@ namespace BotZeitNot.BL.TelegramBotService.Answer
 
             await MessageToTelegram.SendCallBackMessageTelegram(_callbackQuery, newSeriesMessage, _client);
         }
-
-        private async Task<bool> IsUserValid(User user)
-        {
-            if (user == default)
-            {
-                string errorMessage = "Пользователь не был найден, " +
-                                      "попробуйте начать с команды /start";
-
-                await MessageToTelegram.SendCallBackMessageTelegram(_callbackQuery, errorMessage, _client);
-                return false;
-            }
-            return true;
-        }
     }
 }
