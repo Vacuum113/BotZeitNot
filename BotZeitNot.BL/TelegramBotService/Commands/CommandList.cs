@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList
+namespace BotZeitNot.BL.TelegramBotService.Commands
 {
     public class CommandList : ICommandList
     {
@@ -17,7 +17,7 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList
             Type[] typelist = Assembly
                 .GetExecutingAssembly()
                 .GetTypes()
-                .Where(t => t.Namespace == "BotZeitNot.BL.TelegramBotService.Commands.CommandList.List" && t.BaseType.Name == "Command")
+                .Where(t => t.Namespace == "BotZeitNot.BL.TelegramBotService.Commands.List" && t.BaseType.Name == "Command")
                 .ToArray();
 
             foreach (Type type in typelist)

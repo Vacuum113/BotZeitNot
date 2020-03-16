@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Telegram.Bot;
 using Message = Telegram.Bot.Types.Message;
 
-namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList.List
+namespace BotZeitNot.BL.TelegramBotService.Commands.List
 {
     public class HelpCommand : Command
     {
@@ -16,7 +19,7 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.CommandList.List
             _commandList = commandList;
         }
 
-        public async override void Execute(Message message, TelegramBotClient client)
+        public async override Task Execute(Message message, TelegramBotClient client)
         {
             var helpString = new StringBuilder("Все команды бота:\n");
 

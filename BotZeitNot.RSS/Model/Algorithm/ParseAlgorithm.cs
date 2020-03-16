@@ -6,9 +6,9 @@ namespace BotZeitNot.RSS.Model
     {
         public Episode Parse(Tuple<string, string> tupleEpisode)
         {
-            string[] nameAndLink = tupleEpisode.Item1.Split("). ");
+            string[] nameRuAndEn = tupleEpisode.Item1.Split("). ");
 
-            string[] nameEpisAndNumber = nameAndLink[1].Split(". (S");
+            string[] nameEpisAndNumber = nameRuAndEn[1].Split(". (S");
 
             int number;
             var numStr = nameEpisAndNumber[1].Split('E')[1];
@@ -31,7 +31,8 @@ namespace BotZeitNot.RSS.Model
                 Number = number,
                 NumberSeason = numberSeason,
                 TitleRu = nameEpisAndNumber[0],
-                TitleSeries = nameAndLink[0].Split(" (")[0],
+                TitleSeriesEn = nameRuAndEn[0].Split(" (")[1],
+                TitleSeries = nameRuAndEn[0].Split(" (")[0],
                 Link = tupleEpisode.Item2,
                 Rating = null
             };
@@ -41,9 +42,7 @@ namespace BotZeitNot.RSS.Model
         {
             var newStr = str.StartsWith("0") ? str.Remove(0, 1).Replace(")", "") : str.Replace(")", "");
 
-            int number;
-
-            int.TryParse(newStr, out number);
+            int.TryParse(newStr, out int number);
 
             return number;
         }

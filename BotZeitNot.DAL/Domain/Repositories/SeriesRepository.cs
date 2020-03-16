@@ -1,5 +1,5 @@
 ﻿using BotZeitNot.DAL.Domain.Entity;
-using Microsoft.EntityFrameworkCore;
+using BotZeitNot.DAL.Domain.Repositories.SpecificStorage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 
 namespace BotZeitNot.DAL.Domain.Repositories
 {
-    public class SeriesRepository : Repository<Series, int>
+    public class SeriesRepository : Repository<Series, int>, ISeriesRepository
     {
 
         public SeriesRepository(ApplicationDbContext context) : base(context)
@@ -15,22 +15,15 @@ namespace BotZeitNot.DAL.Domain.Repositories
 
         public IEnumerable<Series> GetByNameAllMatchSeries(string name)
         {
-            Expression<Func<Series, bool>> predicate = a => (a.NameRu.ToLowerInvariant() == name.ToLowerInvariant() ||
-                                                             a.NameEn.ToLowerInvariant() == name.ToLowerInvariant()) &&
-                                                             !a.IsCompleted;
+            Expression<Func<Series, bool>> predicateRu = a => a.NameRu.ToLower().StartsWith(name.ToLower());
+            Expression<Func<Series, bool>> predicateEn = a => a.NameEn.ToLower().StartsWith(name.ToLower());
 
             return Table.
-                Where(predicate).
-                Take(7).
-                ToList();
+                Where(predicateRu).
+                Where(predicateEn).
+                Take(7);
         }
 
-        public Series GetSeriesSeasonsAndEpisodesByRuName(string name)
-        {
-            return _context.Series.
-                Include(s => s.Seasons).
-                ThenInclude(s => s.Episodes).
-                FirstOrDefault(a=>a.NameRu == name);
-        }
+        public Series GetByNameRuSeries(string nameRu) => Table.FirstOrDefault(s => s.NameRu == nameRu);
     }
 }

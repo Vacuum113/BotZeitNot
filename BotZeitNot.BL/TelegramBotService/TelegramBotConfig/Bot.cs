@@ -1,4 +1,6 @@
 ﻿using MihaZupan;
+using System;
+using System.IO;
 using Telegram.Bot;
 
 namespace BotZeitNot.BL.TelegramBotService.TelegramBotConfig
@@ -20,9 +22,26 @@ namespace BotZeitNot.BL.TelegramBotService.TelegramBotConfig
             _client = new TelegramBotClient(botConfig.Token, proxy);
         }
 
+        public Bot(string token) => _client = new TelegramBotClient(token);
+
         public async void Run(string responseUrl)
         {
-            await _client.SetWebhookAsync(responseUrl);
+            if (!File.Exists("public.pem"))
+            {
+                try
+                {
+                    FileStream fs = File.OpenRead("public.pem");
+                    await _client.SetWebhookAsync(responseUrl, fs);
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            else
+            {
+                await _client.SetWebhookAsync(responseUrl);
+            }
         }
 
         public TelegramBotClient Get() => _client;

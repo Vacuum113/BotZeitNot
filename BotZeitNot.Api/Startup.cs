@@ -1,11 +1,14 @@
 using AutoMapper;
 using BotZeitNot.BL.TelegramBotService;
-using BotZeitNot.BL.TelegramBotService.Commands.CommandList;
+using BotZeitNot.BL.TelegramBotService.Commands;
 using BotZeitNot.BL.TelegramBotService.TelegramBotConfig;
 using BotZeitNot.DAL;
+using BotZeitNot.DAL.Domain.Repositories;
+using BotZeitNot.DAL.Domain.Repositories.SpecificStorage;
 using BotZeitNot.Domain.Interface;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,9 +29,9 @@ namespace BotZeitNot.Api
         {
             var configBot = Configuration.GetSection("BotConfigProps").Get<BotConfigProps>();
 
-            Bot bot = new Bot(configBot);
+            Bot bot = new Bot(configBot.Token);
 
-            bot.Run("https://578c0c42.ngrok.io/update");
+            bot.Run("https://" + configBot.IPToWebHooks + "/Update/GetUpdate");
 
             services.AddSingleton(servicesProvider =>
             {
@@ -43,7 +46,10 @@ namespace BotZeitNot.Api
                 options.UseMySql(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
+            services.AddScoped<IUserRepository, UserRepository>();
+
+            services.AddScoped<ISubSeriesRepository, SubSeriesRepository>();
+            services.AddScoped<ISeriesRepository, SeriesRepository>();
 
             services.AddScoped<ICommandList, CommandList>();
 
@@ -60,16 +66,19 @@ namespace BotZeitNot.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
             }
-            else
+            //else
+            //{
+            //    app.UseHsts();
+            //}
+
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
-                app.UseHsts();
-            }
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
             app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>

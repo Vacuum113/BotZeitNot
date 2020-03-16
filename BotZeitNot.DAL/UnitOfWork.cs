@@ -10,8 +10,7 @@ namespace BotZeitNot.DAL
 
         private UserRepository _userRepository;
         private SeriesRepository _seriesRepository;
-        private SeasonRepository _seasonRepository;
-        private EpisodeRepository _episodeRepository;
+        private SubSeriesRepository _subSeriesRepository;
 
         private bool _disposed;
 
@@ -20,65 +19,32 @@ namespace BotZeitNot.DAL
             _context = context;
         }
 
-        public UserRepository Users {
-            get {
-                if (_userRepository == null)
-                {
-                    _userRepository = new UserRepository(_context);
-                }
-                return _userRepository;
-            }
+        public UserRepository Users
+        {
+            get => _userRepository ??= new UserRepository(_context);
         }
 
-        public SeriesRepository Series {
-            get {
-                if (_seriesRepository == null)
-                {
-                    _seriesRepository = new SeriesRepository(_context);
-                }
-                return _seriesRepository;
-            }
+        public SeriesRepository Series
+        {
+            get => _seriesRepository ??= new SeriesRepository(_context);
         }
 
-        public SeasonRepository Seasons {
-            get {
-                if (_seasonRepository == null)
-                {
-                    _seasonRepository = new SeasonRepository(_context);
-                }
-                return _seasonRepository;
-            }
+        public SubSeriesRepository SubSeries
+        {
+            get => _subSeriesRepository ??= new SubSeriesRepository(_context);
         }
 
-        public EpisodeRepository Episodes {
-            get {
-                if (_episodeRepository == null)
-                {
-                    _episodeRepository = new EpisodeRepository(_context);
-                }
-                return _episodeRepository;
-            }
-        }
-
-
-        public IRepository<T, TPrimaryKey> GetRepository<T, TPrimaryKey>() where T : class, IEntity<TPrimaryKey>
+        public IRepository<T, TPrimaryKey> GetRepository<T, TPrimaryKey>()
+            where T : class, IEntity<TPrimaryKey>
         {
             return new Repository<T, TPrimaryKey>(_context);
         }
 
-        public void Save()
-        {
-            _context.SaveChanges();
-        }
-
-        public async void SaveAsync()
-        {
-            await _context.SaveChangesAsync();
-        }
+        public void Save()=> _context.SaveChanges();
 
         public virtual void Dispose(bool disposing)
         {
-            if (!this._disposed)
+            if (this._disposed)
             {
                 if (disposing)
                 {

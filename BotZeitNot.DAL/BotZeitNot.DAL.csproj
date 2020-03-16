@@ -31,6 +31,10 @@
     <Compile Remove="Migrations\20200104132834_init.Designer.cs" />
     <Compile Remove="Migrations\20200110170255_init.cs" />
     <Compile Remove="Migrations\20200110170255_init.Designer.cs" />
+    <Compile Remove="Migrations\20200127095625_delete seasons and episodes.cs" />
+    <Compile Remove="Migrations\20200127095625_delete seasons and episodes.Designer.cs" />
+    <Compile Remove="Migrations\20200127095735_delete seasons and episodes entity.cs" />
+    <Compile Remove="Migrations\20200127095735_delete seasons and episodes entity.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

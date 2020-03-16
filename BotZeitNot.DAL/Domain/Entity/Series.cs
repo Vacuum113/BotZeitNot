@@ -1,5 +1,4 @@
 ﻿using BotZeitNot.Domain.Base;
-using System.Collections.Generic;
 
 namespace BotZeitNot.DAL.Domain.Entity
 {
@@ -14,9 +13,5 @@ namespace BotZeitNot.DAL.Domain.Entity
         public string Link { get; set; }
 
         public bool IsCompleted { get; set; }
-
-        public ICollection<SeriesUser> SeriesUser { get; set; }
-
-        public ICollection<Season> Seasons { get; set; }
     }
 }

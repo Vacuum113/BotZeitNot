@@ -1,7 +1,13 @@
-﻿using BotZeitNot.BL.TelegramBotService.Commands;
-using BotZeitNot.BL.TelegramBotService.Commands.CommandList;
+﻿using BotZeitNot.BL.TelegramBotService.Answer;
+using BotZeitNot.BL.TelegramBotService.Commands;
+using BotZeitNot.BL.TelegramBotService.MassMailingNewEpisode;
 using BotZeitNot.BL.TelegramBotService.TelegramBotConfig;
+using BotZeitNot.Domain.Interface;
+using BotZeitNot.Shared.Dto;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -11,81 +17,160 @@ namespace BotZeitNot.BL.TelegramBotService
     public class TelegramBotService : ITelegramBotService
     {
         private readonly ICommandList _commandList;
-
         private readonly TelegramBotClient _client;
+        private readonly IUnitOfWorkFactory _unitOfWorkFactory;
+        private readonly ILogger<TelegramBotService> _logger;
 
         public TelegramBotService
             (
             ICommandList commandList,
-            Bot bot
+            Bot bot,
+            IUnitOfWorkFactory unitOfWorkFactory,
+            ILogger<TelegramBotService> logger
             )
         {
             _commandList = commandList;
             _client = bot.Get();
+            _unitOfWorkFactory = unitOfWorkFactory;
+            _logger = logger;
         }
 
-        public void Run(Update update)
+
+        public async Task Run(Update update)
         {
             if (update == null)
             {
-                throw new NullReferenceException();
+                _logger.LogWarning($"Time: {DateTime.UtcNow}. Empty \"Update\" obj.");
+                return;
             }
+
+            try
+            {
+                switch (update.Type)
+                {
+                    case UpdateType.Message:
+                        await IfMessage(update.Message);
+                        break;
+                    case UpdateType.CallbackQuery:
+                        await IfCAllbackQuery(update.CallbackQuery);
+                        break;
+                    case UpdateType.EditedMessage:
+                        await IfMessage(update.EditedMessage);
+                        break;
+                    default:
+                        await Default(update);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Time: {DateTime.UtcNow}. Catch error in method - 'Run'. Error message: " + ex.Message);
+            }
+        }
+
+        public void SendingNewSeries(IEnumerable<EpisodeDto> episodes)
+        {
+            if (episodes == null)
+            {
+                _logger.LogWarning($"Time: {DateTime.UtcNow}. Empty \"EpisodeDto\" obj.");
+            }
+
+            try
+            {
+                new MassMailing(_unitOfWorkFactory, _client).SendingNewSeries(episodes);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Time: {DateTime.UtcNow}. Catch error in method - 'SendingNewSeries'. Error message: " + ex.Message);
+            }
+        }
+
+
+        private async Task IfMessage(Message message)
+        {
+            bool messageNotNullAndIsNotBot = message != null && !message.From.IsBot;
+            if (!(messageNotNullAndIsNotBot && message.Text != null))
+            {
+                _logger.LogWarning($"Time: {DateTime.UtcNow}. Some problems with Message obj: " + message);
+                return;
+            }
+
+            Command command = _commandList.GetCommand(message.Text);
+            bool isCommandNotNullAndIsMessageValid = command != null && message.Text.StartsWith('/');
+            if (isCommandNotNullAndIsMessageValid)
+            {
+                await command.Execute(message, _client);
+            }
+            else
+            {
+                string helpString = "Для просмотра списка команд - отправте сообщение: \"/help\"\n " +
+                                    "или напишите \"/\" для просмотра доступных команд.";
+
+                await _client.SendTextMessageAsync(message.Chat.Id, helpString);
+            }
+        }
+
+        private async Task IfCAllbackQuery(CallbackQuery callbackQuery)
+        {
+            bool callbackNotNullAndIsNotFromBot = callbackQuery != null && !callbackQuery.From.IsBot;
+            if (!(callbackNotNullAndIsNotFromBot && callbackQuery.Message != null))
+            {
+                _logger.LogWarning($"Time: {DateTime.UtcNow}. Some problems with CallbackQuery obj: " + callbackQuery);
+                return;
+            }
+
+            var answerCallback = new AnswerCallback(callbackQuery, _unitOfWorkFactory, _client);
+            switch (callbackQuery.Data.Split("/")[0])
+            {
+                case "Search":
+                    await answerCallback.Search();
+                    break;
+                case "Cancel":
+                    await answerCallback.Cancel();
+                    break;
+                case "CancelAll":
+                    await answerCallback.Cancel();
+                    break;
+            }
+        }
+
+
+        private async Task Default(Update update)
+        {
+            string defaultString = "Извините, не понял вас.\nДля просмотра списка команд - " +
+                                   "отправте сообщение: \"/help\"\n или напишите \"/\" " +
+                                   "для просмотра доступных команд.";
 
             switch (update.Type)
             {
+                case UpdateType.EditedMessage:
+                    await _client.SendTextMessageAsync(update.EditedMessage.From.Id, defaultString);
+                    break;
                 case UpdateType.Message:
-                    IfMessage(update);
+                    await _client.SendTextMessageAsync(update.Message.From.Id, defaultString);
+                    break;
+                case UpdateType.InlineQuery:
+                    await _client.SendTextMessageAsync(update.InlineQuery.From.Id, defaultString);
+                    break;
+                case UpdateType.EditedChannelPost:
+                    await _client.SendTextMessageAsync(update.EditedChannelPost.From.Id, defaultString);
+                    break;
+                case UpdateType.ChannelPost:
+                    await _client.SendTextMessageAsync(update.ChannelPost.From.Id, defaultString);
                     break;
                 case UpdateType.CallbackQuery:
-                    IfCAllbackQuery(update);
+                    await _client.SendTextMessageAsync(update.CallbackQuery.From.Id, defaultString);
                     break;
-                default: 
-                    Default(update);
+                case UpdateType.ChosenInlineResult:
+                    await _client.SendTextMessageAsync(update.ChosenInlineResult.From.Id, defaultString);
+                    break;
+                case UpdateType.PreCheckoutQuery:
+                    await _client.SendTextMessageAsync(update.PreCheckoutQuery.From.Id, defaultString);
+                    break;
+                case UpdateType.ShippingQuery:
+                    await _client.SendTextMessageAsync(update.ShippingQuery.From.Id, defaultString);
                     break;
             }
         }
-
-        public async void IfMessage(Update update)
-        {
-            if (
-                update.Message != null &&
-                !update.Message.From.IsBot &&
-                update.Message.Text.StartsWith('/')
-                )
-            {
-                Command command = _commandList.GetCommand(update.Message.Text);
-
-                if (command != null)
-                    command.Execute(update.Message, _client);
-                else
-                    await _client.SendTextMessageAsync(update.Message.Chat.Id,
-                        "Для просмотра списка команд - отправте сообщение: \"/help\"\n или напишите \"/\" для просмотра доступных команд.");
-            }
-        }
-
-        public async void IfCAllbackQuery(Update update)
-        {
-            if (update.CallbackQuery != null &&
-                !update.CallbackQuery.From.IsBot &&
-                update.CallbackQuery.Message != null)
-            {
-                if(update.CallbackQuery.Data.Contains("Search"))
-                {
-                    await _client.AnswerCallbackQueryAsync
-                        (
-                        update.CallbackQuery.Id
-                        );
-                    await _client.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, update.CallbackQuery.From.FirstName + ", Вы подписались на новые серии: " + update.CallbackQuery.Data.Split("/")[1]);
-                    await _client.DeleteMessageAsync(update.CallbackQuery.Message.Chat.Id, update.CallbackQuery.Message.MessageId);
-                }
-            }
-        }
-
-        public async void Default(Update update)
-        {
-            await _client.SendTextMessageAsync(update.Message.Chat.Id, "Извините, не понял вас.\n" +
-                "Для просмотра списка команд - отправте сообщение: \"/help\"\n или напишите \"/\" для просмотра доступных команд.");
-        }
-
     }
 }
