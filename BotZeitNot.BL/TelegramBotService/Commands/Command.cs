@@ -8,16 +8,10 @@ namespace BotZeitNot.BL.TelegramBotService.Commands
     {
         public abstract string Name { get; }
 
-        public Command()
-        {
-
-        }
+        public Command() { }
 
         public abstract Task Execute(Message message, TelegramBotClient client);
 
-        public bool Contains(string message)
-        {
-            return message.Equals(this.Name.ToLower()) ? true : false;
-        }
+        public bool Contains(string message) => message.Equals(this.Name.ToLower());
     }
 }

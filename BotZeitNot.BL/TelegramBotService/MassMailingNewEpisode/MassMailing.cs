@@ -14,14 +14,12 @@ namespace BotZeitNot.BL.TelegramBotService.MassMailingNewEpisode
 {
     public class MassMailing
     {
-        private SubSeriesRepository _subSeriesRepository;
-        private SeriesRepository _seriesRepository;
-        private IUnitOfWorkFactory _unitOfWorkFactory;
-        private TelegramBotClient _client;
+        private readonly SubSeriesRepository _subSeriesRepository;
+        private readonly SeriesRepository _seriesRepository;
+        private readonly TelegramBotClient _client;
 
         public MassMailing(IUnitOfWorkFactory unitOfWorkFactory, TelegramBotClient client)
         {
-            _unitOfWorkFactory = unitOfWorkFactory;
             _subSeriesRepository = ((UnitOfWork)unitOfWorkFactory.Create()).SubSeries;
             _seriesRepository = ((UnitOfWork)unitOfWorkFactory.Create()).Series;
             _client = client;

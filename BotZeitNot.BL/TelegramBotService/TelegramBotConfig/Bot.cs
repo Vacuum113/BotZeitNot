@@ -22,14 +22,11 @@ namespace BotZeitNot.BL.TelegramBotService.TelegramBotConfig
             _client = new TelegramBotClient(botConfig.Token, proxy);
         }
 
-        public Bot(string token)
-        {
-            _client = new TelegramBotClient(token);
-        }
+        public Bot(string token) => _client = new TelegramBotClient(token);
 
         public async void Run(string responseUrl)
         {
-            if (File.Exists("public.pem"))
+            if (!File.Exists("public.pem"))
             {
                 try
                 {

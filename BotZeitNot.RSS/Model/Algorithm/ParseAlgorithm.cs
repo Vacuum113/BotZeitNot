@@ -42,9 +42,7 @@ namespace BotZeitNot.RSS.Model
         {
             var newStr = str.StartsWith("0") ? str.Remove(0, 1).Replace(")", "") : str.Replace(")", "");
 
-            int number;
-
-            int.TryParse(newStr, out number);
+            int.TryParse(newStr, out int number);
 
             return number;
         }

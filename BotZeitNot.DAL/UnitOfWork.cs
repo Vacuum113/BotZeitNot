@@ -19,34 +19,19 @@ namespace BotZeitNot.DAL
             _context = context;
         }
 
-        public UserRepository Users {
-            get {
-                if (_userRepository == null)
-                {
-                    _userRepository = new UserRepository(_context);
-                }
-                return _userRepository;
-            }
+        public UserRepository Users
+        {
+            get => _userRepository ??= new UserRepository(_context);
         }
 
-        public SeriesRepository Series {
-            get {
-                if (_seriesRepository == null)
-                {
-                    _seriesRepository = new SeriesRepository(_context);
-                }
-                return _seriesRepository;
-            }
+        public SeriesRepository Series
+        {
+            get => _seriesRepository ??= new SeriesRepository(_context);
         }
 
-        public SubSeriesRepository SubSeries {
-            get {
-                if (_subSeriesRepository == null)
-                {
-                    _subSeriesRepository = new SubSeriesRepository(_context);
-                }
-                return _subSeriesRepository;
-            }
+        public SubSeriesRepository SubSeries
+        {
+            get => _subSeriesRepository ??= new SubSeriesRepository(_context);
         }
 
         public IRepository<T, TPrimaryKey> GetRepository<T, TPrimaryKey>()
@@ -55,14 +40,11 @@ namespace BotZeitNot.DAL
             return new Repository<T, TPrimaryKey>(_context);
         }
 
-        public void Save()
-        {
-            _context.SaveChanges();
-        }
+        public void Save()=> _context.SaveChanges();
 
         public virtual void Dispose(bool disposing)
         {
-            if (!this._disposed)
+            if (this._disposed)
             {
                 if (disposing)
                 {

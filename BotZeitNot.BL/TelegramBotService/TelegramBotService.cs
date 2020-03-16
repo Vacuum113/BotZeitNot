@@ -18,9 +18,8 @@ namespace BotZeitNot.BL.TelegramBotService
     {
         private readonly ICommandList _commandList;
         private readonly TelegramBotClient _client;
-
-        private IUnitOfWorkFactory _unitOfWorkFactory;
-        private ILogger<TelegramBotService> _logger;
+        private readonly IUnitOfWorkFactory _unitOfWorkFactory;
+        private readonly ILogger<TelegramBotService> _logger;
 
         public TelegramBotService
             (
@@ -71,20 +70,18 @@ namespace BotZeitNot.BL.TelegramBotService
 
         public void SendingNewSeries(IEnumerable<EpisodeDto> episodes)
         {
-            if (episodes != null)
-            {
-                try
-                {
-                    new MassMailing(_unitOfWorkFactory, _client).SendingNewSeries(episodes);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, $"Time: {DateTime.UtcNow}. Catch error in method - 'SendingNewSeries'. Error message: " + ex.Message);
-                }
-            }
-            else
+            if (episodes == null)
             {
                 _logger.LogWarning($"Time: {DateTime.UtcNow}. Empty \"EpisodeDto\" obj.");
+            }
+
+            try
+            {
+                new MassMailing(_unitOfWorkFactory, _client).SendingNewSeries(episodes);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Time: {DateTime.UtcNow}. Catch error in method - 'SendingNewSeries'. Error message: " + ex.Message);
             }
         }
 
@@ -92,54 +89,48 @@ namespace BotZeitNot.BL.TelegramBotService
         private async Task IfMessage(Message message)
         {
             bool messageNotNullAndIsNotBot = message != null && !message.From.IsBot;
-            if (messageNotNullAndIsNotBot && message.Text != null)
-            {
-                Command command = _commandList.GetCommand(message.Text);
-                bool isCommandNotNullAndIsMessageValid = command != null && message.Text.StartsWith('/');
-
-                if (isCommandNotNullAndIsMessageValid)
-                {
-                    await command.Execute(message, _client);
-                }
-                else
-                {
-                    string helpString = "Для просмотра списка команд - отправте сообщение: \"/help\"\n " +
-                                        "или напишите \"/\" для просмотра доступных команд.";
-
-                    await _client.SendTextMessageAsync(message.Chat.Id, helpString);
-                }
-            }
-            else
+            if (!(messageNotNullAndIsNotBot && message.Text != null))
             {
                 _logger.LogWarning($"Time: {DateTime.UtcNow}. Some problems with Message obj: " + message);
                 return;
+            }
+
+            Command command = _commandList.GetCommand(message.Text);
+            bool isCommandNotNullAndIsMessageValid = command != null && message.Text.StartsWith('/');
+            if (isCommandNotNullAndIsMessageValid)
+            {
+                await command.Execute(message, _client);
+            }
+            else
+            {
+                string helpString = "Для просмотра списка команд - отправте сообщение: \"/help\"\n " +
+                                    "или напишите \"/\" для просмотра доступных команд.";
+
+                await _client.SendTextMessageAsync(message.Chat.Id, helpString);
             }
         }
 
         private async Task IfCAllbackQuery(CallbackQuery callbackQuery)
         {
             bool callbackNotNullAndIsNotFromBot = callbackQuery != null && !callbackQuery.From.IsBot;
-
-            if (callbackNotNullAndIsNotFromBot && callbackQuery.Message != null)
-            {
-                var answerCallback = new AnswerCallback(callbackQuery, _unitOfWorkFactory, _client);
-                switch (callbackQuery.Data.Split("/")[0])
-                {
-                    case "Search":
-                        await answerCallback.Search();
-                        break;
-                    case "Cancel":
-                        await answerCallback.Cancel();
-                        break;
-                    case "CancelAll":
-                        await answerCallback.Cancel();
-                        break;
-                }
-            }
-            else
+            if (!(callbackNotNullAndIsNotFromBot && callbackQuery.Message != null))
             {
                 _logger.LogWarning($"Time: {DateTime.UtcNow}. Some problems with CallbackQuery obj: " + callbackQuery);
                 return;
+            }
+
+            var answerCallback = new AnswerCallback(callbackQuery, _unitOfWorkFactory, _client);
+            switch (callbackQuery.Data.Split("/")[0])
+            {
+                case "Search":
+                    await answerCallback.Search();
+                    break;
+                case "Cancel":
+                    await answerCallback.Cancel();
+                    break;
+                case "CancelAll":
+                    await answerCallback.Cancel();
+                    break;
             }
         }
 

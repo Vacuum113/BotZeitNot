@@ -10,24 +10,11 @@ namespace BotZeitNot.RSS
 {
     public class Exporter
     {
+        private readonly string _botUrl;
+        private readonly ILogger<Exporter> _logger;
+
         private List<Episode> _prevEpisodes;
-
-        public List<Episode> PrevEpisodes {
-            get {
-                return _prevEpisodes;
-            }
-        }
-
         private List<Episode> _episodes;
-
-        public List<Episode> Episodes {
-            get {
-                return _episodes;
-            }
-        }
-
-        private string _botUrl;
-        private ILogger<Exporter> _logger;
 
         public Exporter(Settings settings)
         {
@@ -86,5 +73,16 @@ namespace BotZeitNot.RSS
             return difference;
         }
 
+
+
+        public List<Episode> PrevEpisodes
+        {
+            get => _prevEpisodes;
+        }
+
+        public List<Episode> Episodes
+        {
+            get => _episodes;
+        }
     }
 }

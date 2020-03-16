@@ -24,9 +24,6 @@ namespace BotZeitNot.DAL.Domain.Repositories
                 Take(7);
         }
 
-        public Series GetByNameRuSeries(string nameRu)
-        {
-            return Table.FirstOrDefault(s => s.NameRu == nameRu);
-        }
+        public Series GetByNameRuSeries(string nameRu) => Table.FirstOrDefault(s => s.NameRu == nameRu);
     }
 }

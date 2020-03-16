@@ -11,9 +11,6 @@ namespace BotZeitNot.DAL
             _context = context;
         }
 
-        public IUnitOfWork Create()
-        {
-            return new UnitOfWork(_context);
-        }
+        public IUnitOfWork Create() => new UnitOfWork(_context);
     }
 }

@@ -20,35 +20,16 @@ namespace BotZeitNot.DAL
             Table = context.Set<T>();
         }
 
-        public T GetById(TPrimaryKey id)
-        {
-            return Table.FirstOrDefault(c => c.Id.Equals(id));
-        }
+        public T GetById(TPrimaryKey id)=> Table.FirstOrDefault(c => c.Id.Equals(id));
 
-        public void Add(T entity)
-        {
-            Table.Add(entity);
-        }
+        public void Add(T entity) => Table.Add(entity);
 
-        public void Update(T entity)
-        {
-            Table.Update(entity);
-        }
+        public void Update(T entity) => Table.Update(entity);
 
-        public void Delete(T entity)
-        {
-            Table.Remove(entity);
-        }
+        public void Delete(T entity) => Table.Remove(entity);
 
-        public IEnumerable<T> All()
-        {
-            return Table.ToList();
-        }
+        public IEnumerable<T> All() => Table.ToList();
 
-        public IEnumerable<T> Where(Expression<Func<T, bool>> where)
-        {
-            return Table.Where(where).ToList();
-        }
-
+        public IEnumerable<T> Where(Expression<Func<T, bool>> where) => Table.Where(where).ToList();
     }
 }

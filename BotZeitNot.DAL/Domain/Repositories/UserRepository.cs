@@ -15,7 +15,7 @@ namespace BotZeitNot.DAL.Domain.Repositories
         public bool ContainsUserByTelegramId(int id)
         {
             User user = Table.FirstOrDefault(u => u.TelegramId == id);
-            return user != default ? true : false;
+            return user != default;
         }
     }
 }

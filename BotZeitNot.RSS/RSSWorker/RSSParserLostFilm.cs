@@ -8,7 +8,7 @@ namespace BotZeitNot.RSS
 {
     public class RSSParserLostFilm
     {
-        private ILogger<RSSParserLostFilm> _logger;
+        private readonly ILogger<RSSParserLostFilm> _logger;
 
         public RSSParserLostFilm()
         {

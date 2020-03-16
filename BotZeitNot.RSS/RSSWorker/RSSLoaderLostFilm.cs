@@ -10,8 +10,8 @@ namespace BotZeitNot.RSS
 {
     public class RSSLoaderLostFilm
     {
-        private string _loadingString;
-        private ILogger<RSSLoaderLostFilm> _logger;
+        private readonly string _loadingString;
+        private readonly ILogger<RSSLoaderLostFilm> _logger;
 
         public RSSLoaderLostFilm(Settings settings)
         {

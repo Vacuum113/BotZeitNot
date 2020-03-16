@@ -46,7 +46,7 @@ namespace BotZeitNot.DAL.Domain.Repositories
             Expression<Func<SubscriptionSeries, bool>> predicate = ss => ss.ChatId == chatId && ss.SeriesNameRu == nameRu;
             var subSer = Table.FirstOrDefault(predicate);
 
-            return subSer != default ? true : false;
+            return subSer != default;
         }
 
         public void AddSubscription(long chatId, string nameRu)
