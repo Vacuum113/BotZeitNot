@@ -1,5 +1,4 @@
-﻿using BotZeitNot.Domain.Interface;
-using BotZeitNot.Shared.Dto;
+﻿using BotZeitNot.Shared.Dto;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;

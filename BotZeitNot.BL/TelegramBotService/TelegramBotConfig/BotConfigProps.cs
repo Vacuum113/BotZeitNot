@@ -2,7 +2,7 @@
 {
     public class BotConfigProps
     {
-        public string SocksIP { get; set; }
+        public string SocksIp { get; set; }
 
         public int SocksPort { get; set; }
 
@@ -12,6 +12,6 @@
 
         public string Token { get; set; }
 
-        public string IPToWebHooks { get; set; }
+        public string IpToWebHooks { get; set; }
     }
 }

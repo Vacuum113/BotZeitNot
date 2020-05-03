@@ -1,8 +1,6 @@
 ﻿using BotZeitNot.DAL;
 using BotZeitNot.DAL.Domain.Repositories;
 using BotZeitNot.Domain.Interface;
-using Microsoft.Extensions.Logging;
-using System;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Message = Telegram.Bot.Types.Message;
@@ -15,8 +13,8 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
     {
         public override string Name => "/start";
 
-        private IUnitOfWorkFactory _unitOfWorkFactory;
-        private UserRepository _userRepository;
+        private readonly IUnitOfWorkFactory _unitOfWorkFactory;
+        private readonly UserRepository _userRepository;
         private TelegramBotClient _client;
 
         public StartCommand(IUnitOfWorkFactory unitOfWorkFactory)
@@ -25,11 +23,11 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
             _userRepository = ((UnitOfWork)unitOfWorkFactory.Create()).Users;
         }
 
-        public async override Task Execute(Message message, TelegramBotClient client)
+        public override async Task Execute(Message message, TelegramBotClient client)
         {
             _client = client;
 
-            using (IUnitOfWork unitOfWork = _unitOfWorkFactory.Create())
+            using (var unitOfWork = _unitOfWorkFactory.Create())
             {
                 if (IsUserContainsInDb(message).Result)
                 {
@@ -41,8 +39,8 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
                     ChatId = message.Chat.Id,
                     TelegramId = message.From.Id,
                     FirstName = message.From.FirstName,
-                    UserName = message.From.Username ?? null,
-                    LastName = message.From.LastName ?? null
+                    UserName = message.From.Username,
+                    LastName = message.From.LastName
                 });
 
                 unitOfWork.Save();
@@ -53,21 +51,19 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
 
         private async Task<bool> IsUserContainsInDb(Message message)
         {
-            if (_userRepository.ContainsUserByTelegramId(message.From.Id))
-            {
-                string errorMessage = "Вы уже использовали команду /start ";
+            if (!_userRepository.ContainsUserByTelegramId(message.From.Id)) 
+                return false;
+            const string errorMessage = "Вы уже использовали команду /start ";
 
-                await _client.SendTextMessageAsync(message.Chat.Id, errorMessage);
-                return true;
-            }
-            return false;
+            await _client.SendTextMessageAsync(message.Chat.Id, errorMessage);
+            return true;
         }
 
         private async Task SendStartMessage(Message message)
         {
-            string startMessage = "Напишите нам, на рассылку " +
-                      "каких сериалов вы хотите подписаться.\n" +
-                      "Введите: /search <Сериал для поиска>. Без ковычек.";
+            const string startMessage = "Напишите нам, на рассылку " +
+                                        "каких сериалов вы хотите подписаться.\n" +
+                                        "Введите: /search <Сериал для поиска>. Без ковычек.";
 
             await _client.SendTextMessageAsync(message.Chat.Id, startMessage);
         }

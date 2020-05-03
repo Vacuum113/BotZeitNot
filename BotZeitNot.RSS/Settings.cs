@@ -4,9 +4,9 @@
     {
         public string BotUrl { get; set; }
 
-        public string LostFilmRSSLink { get; set; }
+        public string LostFilmRssLink { get; set; }
 
-        public string SocksIP { get; set; }
+        public string SocksIp { get; set; }
 
         public int SocksPort { get; set; }
 

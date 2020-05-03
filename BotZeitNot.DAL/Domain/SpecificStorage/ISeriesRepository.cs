@@ -1,7 +1,7 @@
-﻿using BotZeitNot.DAL.Domain.Entity;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using BotZeitNot.DAL.Domain.Entity;
 
-namespace BotZeitNot.DAL.Domain.Repositories.SpecificStorage
+namespace BotZeitNot.DAL.Domain.SpecificStorage
 {
     public interface ISeriesRepository
     {

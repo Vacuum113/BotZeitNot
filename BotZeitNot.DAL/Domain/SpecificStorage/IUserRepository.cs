@@ -1,6 +1,4 @@
-﻿using BotZeitNot.DAL.Domain.Entity;
-
-namespace BotZeitNot.DAL.Domain.Repositories.SpecificStorage
+﻿namespace BotZeitNot.DAL.Domain.SpecificStorage
 {
     public interface IUserRepository
     {

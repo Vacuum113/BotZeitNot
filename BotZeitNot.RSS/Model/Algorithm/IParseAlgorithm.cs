@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BotZeitNot.RSS.Model
+namespace BotZeitNot.RSS.Model.Algorithm
 {
     public interface IParseAlgorithm
     {

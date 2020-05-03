@@ -1,4 +1,5 @@
 ﻿using System;
+using BotZeitNot.RSS.Model.Algorithm;
 
 namespace BotZeitNot.RSS.Model
 {
@@ -22,7 +23,7 @@ namespace BotZeitNot.RSS.Model
         {
             var epis = parseAlgorithm.Parse(tupleEpisode);
 
-            episode = epis ?? null;
+            episode = epis;
 
             return episode != null;
         }

@@ -7,6 +7,8 @@ using System.IO;
 using System.Text.Json;
 using System.Threading;
 using System.Xml;
+using BotZeitNot.RSS.Model.Algorithm;
+using BotZeitNot.RSS.RSSWorker;
 
 namespace BotZeitNot.RSS
 {
@@ -27,14 +29,11 @@ namespace BotZeitNot.RSS
                 builder.AddConsole();
                 builder.AddDebug();
             });
-            var _logger = loggerFactory.CreateLogger<Program>();
+            var logger = loggerFactory.CreateLogger<Program>();
 
-            XmlReader xmlReader;
-            List<Tuple<string, string>> episodesStrings;
-            List<Episode> listEpisodes;
-            List<Episode> listEpisodesPrev = new List<Episode>();
+            var listEpisodesPrev = new List<Episode>();
 
-            using (FileStream fileStream = new FileStream("pervEpisodes.json", FileMode.OpenOrCreate))
+            using (var fileStream = new FileStream("pervEpisodes.json", FileMode.OpenOrCreate))
             {
                 if (fileStream.Length != 0)
                 {
@@ -46,17 +45,15 @@ namespace BotZeitNot.RSS
             {
                 try
                 {
-                    xmlReader = new RSSLoaderLostFilm(settings).LoadFromRSS().Result;
+                    var xmlReader = new RssLoaderLostFilm(settings).LoadFromRss().Result;
 
-                    episodesStrings = new RSSParserLostFilm().ParseNamesAndLinks(xmlReader);
+                    var episodesStrings = new RssParserLostFilm().ParseNamesAndLinks(xmlReader);
 
-                    listEpisodes = new List<Episode>();
+                    var listEpisodes = new List<Episode>();
 
                     foreach (var item in episodesStrings)
                     {
-                        Episode episode;
-
-                        if (Episode.TryParse(new ParseAlgorithm(), item, out episode))
+                        if (Episode.TryParse(new ParseAlgorithm(), item, out var episode))
                         {
                             listEpisodes.Add(episode);
                         }
@@ -71,7 +68,7 @@ namespace BotZeitNot.RSS
                     listEpisodesPrev = listEpisodes;
 
                     File.WriteAllText("pervEpisodes.json", string.Empty);
-                    using (FileStream fileStream = new FileStream("pervEpisodes.json", FileMode.OpenOrCreate))
+                    using (var fileStream = new FileStream("pervEpisodes.json", FileMode.OpenOrCreate))
                     {
                         JsonSerializer.SerializeAsync(fileStream, listEpisodesPrev);
                     }
@@ -80,11 +77,10 @@ namespace BotZeitNot.RSS
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"Time: { DateTime.UtcNow}. Catch error in method - 'Program'.Error message: " + ex.Message);
+                    logger.LogError(ex, $"Time: { DateTime.UtcNow}. Catch error in method - 'Program'.Error message: " + ex.Message);
                     Thread.Sleep(TimeSpan.FromMinutes(2));
                 }
             }
-
         }
     }
 }

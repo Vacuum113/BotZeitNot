@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -30,9 +31,7 @@ namespace BotZeitNot.RSS
 
         public bool Export(List<Episode> episodes, List<Episode> prevEpisodes)
         {
-            if (episodes == null) throw new NullReferenceException();
-
-            _episodes = episodes;
+            _episodes = episodes ?? throw new NullReferenceException();
             _prevEpisodes = prevEpisodes;
 
             episodes = IsolatingDifference(episodes, prevEpisodes);
@@ -42,47 +41,29 @@ namespace BotZeitNot.RSS
                 return true;
             }
 
-            using (HttpClient client = new HttpClient())
-            {
-                string jsonEpisodes = JsonSerializer.Serialize(episodes);
-                var content = new StringContent(jsonEpisodes, Encoding.UTF8, "application/json");
-                var result = client.PostAsync(_botUrl, content).Result;
-                _logger.LogInformation($"Time: { DateTime.UtcNow}. Response: {result.ToString()}");
+            using var client = new HttpClient();
+            var jsonEpisodes = JsonSerializer.Serialize(episodes);
+            var content = new StringContent(jsonEpisodes, Encoding.UTF8, "application/json");
+            var result = client.PostAsync(_botUrl, content).Result;
+            _logger.LogInformation($"Time: { DateTime.UtcNow}. Response: {result.ToString()}");
 
-                return result.IsSuccessStatusCode ? true : false;
-            }
+            return result.IsSuccessStatusCode ? true : false;
         }
 
-        private List<Episode> IsolatingDifference(List<Episode> newEpisodes, List<Episode> prevEpisodes)
+        private List<Episode> IsolatingDifference(List<Episode> newEpisodes, ICollection<Episode> prevEpisodes)
         {
             if (newEpisodes == null)
                 throw new NullReferenceException();
             else if (prevEpisodes == null || prevEpisodes.Count == 0)
                 return newEpisodes;
 
-            List<Episode> difference = new List<Episode>();
-
-            foreach (var item in newEpisodes)
-            {
-                if (!prevEpisodes.Contains(item))
-                {
-                    difference.Add(item);
-                }
-            }
-
-            return difference;
+            return newEpisodes.Where(item => !prevEpisodes.Contains(item)).ToList();
         }
 
 
 
-        public List<Episode> PrevEpisodes
-        {
-            get => _prevEpisodes;
-        }
+        public List<Episode> PrevEpisodes => _prevEpisodes;
 
-        public List<Episode> Episodes
-        {
-            get => _episodes;
-        }
+        public List<Episode> Episodes => _episodes;
     }
 }

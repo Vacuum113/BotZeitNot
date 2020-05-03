@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -19,16 +17,15 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
             _commandList = commandList;
         }
 
-        public async override Task Execute(Message message, TelegramBotClient client)
+        public override async Task Execute(Message message, TelegramBotClient client)
         {
             var helpString = new StringBuilder("Все команды бота:\n");
 
             foreach (var command in _commandList)
             {
-                if (command.Name != "/help")
-                {
-                    helpString.Append(command.Name + '\n');
-                }
+                if (command.Name == "/help")
+                    continue;
+                helpString.Append(command.Name + '\n');
             }
 
             await client.SendTextMessageAsync(message.Chat.Id, helpString.ToString());

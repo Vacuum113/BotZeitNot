@@ -13,7 +13,7 @@ namespace BotZeitNot.BL.TelegramBotService.TelegramBotConfig
         {
             var proxy = new HttpToSocks5Proxy
                 (
-                botConfig.SocksIP,
+                botConfig.SocksIp,
                 botConfig.SocksPort,
                 botConfig.SocksUser,
                 botConfig.SocksPassword
@@ -28,15 +28,8 @@ namespace BotZeitNot.BL.TelegramBotService.TelegramBotConfig
         {
             if (!File.Exists("public.pem"))
             {
-                try
-                {
-                    FileStream fs = File.OpenRead("public.pem");
-                    await _client.SetWebhookAsync(responseUrl, fs);
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
+                var fs = File.OpenRead("public.pem");
+                await _client.SetWebhookAsync(responseUrl, fs);
             }
             else
             {

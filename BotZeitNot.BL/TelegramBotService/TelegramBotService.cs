@@ -88,23 +88,23 @@ namespace BotZeitNot.BL.TelegramBotService
 
         private async Task IfMessage(Message message)
         {
-            bool messageNotNullAndIsNotBot = message != null && !message.From.IsBot;
+            var messageNotNullAndIsNotBot = message != null && !message.From.IsBot;
             if (!(messageNotNullAndIsNotBot && message.Text != null))
             {
                 _logger.LogWarning($"Time: {DateTime.UtcNow}. Some problems with Message obj: " + message);
                 return;
             }
 
-            Command command = _commandList.GetCommand(message.Text);
-            bool isCommandNotNullAndIsMessageValid = command != null && message.Text.StartsWith('/');
+            var command = _commandList.GetCommand(message.Text);
+            var isCommandNotNullAndIsMessageValid = command != null && message.Text.StartsWith('/');
             if (isCommandNotNullAndIsMessageValid)
             {
                 await command.Execute(message, _client);
             }
             else
             {
-                string helpString = "Для просмотра списка команд - отправте сообщение: \"/help\"\n " +
-                                    "или напишите \"/\" для просмотра доступных команд.";
+                const string helpString = "Для просмотра списка команд - отправте сообщение: \"/help\"\n " +
+                                          "или напишите \"/\" для просмотра доступных команд.";
 
                 await _client.SendTextMessageAsync(message.Chat.Id, helpString);
             }
@@ -112,7 +112,7 @@ namespace BotZeitNot.BL.TelegramBotService
 
         private async Task IfCAllbackQuery(CallbackQuery callbackQuery)
         {
-            bool callbackNotNullAndIsNotFromBot = callbackQuery != null && !callbackQuery.From.IsBot;
+            var callbackNotNullAndIsNotFromBot = callbackQuery != null && !callbackQuery.From.IsBot;
             if (!(callbackNotNullAndIsNotFromBot && callbackQuery.Message != null))
             {
                 _logger.LogWarning($"Time: {DateTime.UtcNow}. Some problems with CallbackQuery obj: " + callbackQuery);
@@ -137,9 +137,9 @@ namespace BotZeitNot.BL.TelegramBotService
 
         private async Task Default(Update update)
         {
-            string defaultString = "Извините, не понял вас.\nДля просмотра списка команд - " +
-                                   "отправте сообщение: \"/help\"\n или напишите \"/\" " +
-                                   "для просмотра доступных команд.";
+            const string defaultString = "Извините, не понял вас.\nДля просмотра списка команд - " +
+                                         "отправте сообщение: \"/help\"\n или напишите \"/\" " +
+                                         "для просмотра доступных команд.";
 
             switch (update.Type)
             {
