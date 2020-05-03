@@ -2,21 +2,17 @@
 using BotZeitNot.DAL;
 using BotZeitNot.DAL.Domain.Repositories;
 using BotZeitNot.Domain.Interface;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using User = BotZeitNot.DAL.Domain.Entity.User;
 
 namespace BotZeitNot.BL.TelegramBotService.Answer
 {
     public class AnswerCallback
     {
-        private CallbackQuery _callbackQuery;
-        private IUnitOfWorkFactory _unitOfWorkFactory;
-        private TelegramBotClient _client;
+        private readonly CallbackQuery _callbackQuery;
+        private readonly IUnitOfWorkFactory _unitOfWorkFactory;
+        private readonly TelegramBotClient _client;
 
         public AnswerCallback
             (
@@ -35,10 +31,9 @@ namespace BotZeitNot.BL.TelegramBotService.Answer
         {
             if (_callbackQuery.Data == "CancelAll")
             {
-                using (IUnitOfWork unitOfWork = _unitOfWorkFactory.Create())
+                using (var unitOfWork = _unitOfWorkFactory.Create())
                 {
-                    SubSeriesRepository subSeriesRepository = ((UnitOfWork)unitOfWork).SubSeries;
-                    UserRepository userRepository = ((UnitOfWork)unitOfWork).Users;
+                    var subSeriesRepository = ((UnitOfWork)unitOfWork).SubSeries;
 
                     subSeriesRepository.CancelSubscriptionFromAll(_callbackQuery.From.Id);
                     unitOfWork.Save();
@@ -51,15 +46,14 @@ namespace BotZeitNot.BL.TelegramBotService.Answer
             }
             else
             {
-                using (IUnitOfWork unitOfWork = _unitOfWorkFactory.Create())
+                using (var unitOfWork = _unitOfWorkFactory.Create())
                 {
-                    string nameRu = _callbackQuery.Data.Split("/")[1];
-                    SubSeriesRepository subSeriesRepository = ((UnitOfWork)unitOfWork).SubSeries;
+                    var nameRu = _callbackQuery.Data.Split("/")[1];
+                    var subSeriesRepository = ((UnitOfWork)unitOfWork).SubSeries;
 
+                    var errorMessage = $"Вы уже отписались от рассылки сериала - {nameRu}";
                     if (!subSeriesRepository.IsUserSubscribedToSeries(_callbackQuery.Message.Chat.Id, nameRu))
                     {
-                        string errorMessage = $"Вы уже отписались от рассылки сериала - {nameRu}";
-
                         await MessageToTelegram.SendCallBackMessageTelegram(_callbackQuery, errorMessage, _client);
                         return;
                     }
@@ -78,17 +72,17 @@ namespace BotZeitNot.BL.TelegramBotService.Answer
 
         public async Task Search()
         {
-            long chatId = _callbackQuery.Message.Chat.Id;
-            string nameRu = _callbackQuery.Data.Split("/")[1];
+            var chatId = _callbackQuery.Message.Chat.Id;
+            var nameRu = _callbackQuery.Data.Split("/")[1];
 
-            using (IUnitOfWork unitOfWork = _unitOfWorkFactory.Create())
+            using (var unitOfWork = _unitOfWorkFactory.Create())
             {
-                SubSeriesRepository subSeriesRepository = ((UnitOfWork)unitOfWork).SubSeries;
+                var subSeriesRepository = ((UnitOfWork)unitOfWork).SubSeries;
 
-                var IsExistSubscription = subSeriesRepository.IsUserSubscribedToSeries(chatId, nameRu);
-                if (IsExistSubscription)
+                var isExistSubscription = subSeriesRepository.IsUserSubscribedToSeries(chatId, nameRu);
+                if (isExistSubscription)
                 {
-                    string errorMessage = $"Вы уже подписаны на {nameRu}";
+                    var errorMessage = $"Вы уже подписаны на {nameRu}";
 
                     await MessageToTelegram.SendCallBackMessageTelegram(_callbackQuery, errorMessage, _client);
                     return;

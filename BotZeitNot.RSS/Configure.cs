@@ -12,7 +12,7 @@ namespace BotZeitNot.RSS
 
         public static void ConfigurationFromFile()
         {
-            IConfigurationBuilder configuration = new ConfigurationBuilder()
+            var configuration = new ConfigurationBuilder()
                     .AddJsonFile("appsettings.json", true, true);
 
             var devEnvironmentVariable = Environment.GetEnvironmentVariable("NETCORE_ENVIRONMENT");

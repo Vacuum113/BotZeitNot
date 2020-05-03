@@ -14,19 +14,18 @@ namespace BotZeitNot.BL.TelegramBotService.Commands
         {
             Commands = new List<Command>();
 
-            Type[] typelist = Assembly
+            var typelist = Assembly
                 .GetExecutingAssembly()
                 .GetTypes()
-                .Where(t => t.Namespace == "BotZeitNot.BL.TelegramBotService.Commands.List" && t.BaseType.Name == "Command")
+                .Where(t => t.BaseType != null && (t.Namespace == "BotZeitNot.BL.TelegramBotService.Commands.List" && t.BaseType.Name == "Command"))
                 .ToArray();
 
-            foreach (Type type in typelist)
+            foreach (var type in typelist)
             {
-                if (type.IsClass && type.Name != "HelpCommand")
-                {
-                    var com = Activator.CreateInstance(Type.GetType(type.FullName), unitOfWorkFactory);
-                    Set(com as Command);
-                }
+                if (!type.IsClass || type.Name == "HelpCommand") 
+                    continue;
+                var com = Activator.CreateInstance(Type.GetType(type.FullName), unitOfWorkFactory);
+                Set(com as Command);
             }
 
             var typeHelp = typelist.First(t => t.IsClass && t.Name == "HelpCommand");
@@ -44,14 +43,7 @@ namespace BotZeitNot.BL.TelegramBotService.Commands
                 return Commands.First(c => c.Name == "/search");
             }
 
-            foreach (var item in Commands)
-            {
-                if (item.Contains(commandMessage))
-                {
-                    return item;
-                }
-            }
-            return null;
+            return Commands.FirstOrDefault(item => item.Contains(commandMessage));
         }
     }
 }

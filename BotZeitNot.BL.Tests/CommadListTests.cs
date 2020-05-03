@@ -9,7 +9,7 @@ namespace BotZeitNot.BL.Tests
     [TestClass]
     public class CommadListTests
     {
-        private Mock<IUnitOfWorkFactory> _mockIUnitOfWorkFactory;
+        private readonly Mock<IUnitOfWorkFactory> _mockIUnitOfWorkFactory;
 
         public CommadListTests()
         {
@@ -26,7 +26,7 @@ namespace BotZeitNot.BL.Tests
         {
             var commandList = new CommandList(_mockIUnitOfWorkFactory.Object);
 
-            Command command = commandList.GetCommand("/start");
+            var command = commandList.GetCommand("/start");
 
             Assert.AreEqual("/start", command.Name);
         }
@@ -36,7 +36,7 @@ namespace BotZeitNot.BL.Tests
         {
             var commandList = new CommandList(_mockIUnitOfWorkFactory.Object);
 
-            Command command = commandList.GetCommand("/search Мистер Робот");
+            var command = commandList.GetCommand("/search Мистер Робот");
 
             Assert.AreEqual("/search", command.Name);
         }
@@ -46,7 +46,7 @@ namespace BotZeitNot.BL.Tests
         {
             var commandList = new CommandList(_mockIUnitOfWorkFactory.Object);
 
-            Command command = commandList.GetCommand("/help");
+            var command = commandList.GetCommand("/help");
 
             Assert.AreEqual("/help", command.Name);
         }
@@ -56,7 +56,7 @@ namespace BotZeitNot.BL.Tests
         {
             var commandList = new CommandList(_mockIUnitOfWorkFactory.Object);
 
-            Command command = commandList.GetCommand("/start/start");
+            var command = commandList.GetCommand("/start/start");
 
             Assert.AreEqual(null, command);
         }
@@ -66,7 +66,7 @@ namespace BotZeitNot.BL.Tests
         {
             var commandList = new CommandList(_mockIUnitOfWorkFactory.Object);
 
-            Command command = commandList.GetCommand("sad");
+            var command = commandList.GetCommand("sad");
 
             Assert.AreEqual(null, command);
         }
@@ -76,7 +76,7 @@ namespace BotZeitNot.BL.Tests
         {
             var commandList = new CommandList(_mockIUnitOfWorkFactory.Object);
 
-            Command command = commandList.GetCommand("/sad");
+            var command = commandList.GetCommand("/sad");
 
             Assert.AreEqual(null, command);
         }

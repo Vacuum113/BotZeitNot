@@ -1,18 +1,17 @@
 ﻿using System;
 
-namespace BotZeitNot.RSS.Model
+namespace BotZeitNot.RSS.Model.Algorithm
 {
     public class ParseAlgorithm : IParseAlgorithm
     {
         public Episode Parse(Tuple<string, string> tupleEpisode)
         {
-            string[] nameRuAndEn = tupleEpisode.Item1.Split("). ");
+            var nameRuAndEn = tupleEpisode.Item1.Split("). ");
 
-            string[] nameEpisAndNumber = nameRuAndEn[1].Split(". (S");
+            var nameEpisAndNumber = nameRuAndEn[1].Split(". (S");
 
-            int number;
             var numStr = nameEpisAndNumber[1].Split('E')[1];
-            number = FormatAndParseInInt(numStr);
+            var number = FormatAndParseInInt(numStr);
             if (number == 0)
             {
                 return null;

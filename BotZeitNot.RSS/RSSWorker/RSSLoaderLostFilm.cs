@@ -1,31 +1,30 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
-using System.IO;
+﻿using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Microsoft.Extensions.Logging;
 
-namespace BotZeitNot.RSS
+namespace BotZeitNot.RSS.RSSWorker
 {
-    public class RSSLoaderLostFilm
+    public class RssLoaderLostFilm
     {
         private readonly string _loadingString;
-        private readonly ILogger<RSSLoaderLostFilm> _logger;
+        private readonly ILogger<RssLoaderLostFilm> _logger;
 
-        public RSSLoaderLostFilm(Settings settings)
+        public RssLoaderLostFilm(Settings settings)
         {
-            _loadingString = settings.LostFilmRSSLink;
+            _loadingString = settings.LostFilmRssLink;
 
             var loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder.AddConsole();
                 builder.AddDebug();
             });
-            _logger = loggerFactory.CreateLogger<RSSLoaderLostFilm>();
+            _logger = loggerFactory.CreateLogger<RssLoaderLostFilm>();
         }
 
-        public async Task<XmlReader> LoadFromRSS()
+        public async Task<XmlReader> LoadFromRss()
         {
             string rssString;
             using (HttpClient client = new HttpClient())

@@ -1,15 +1,13 @@
 ﻿using BotZeitNot.DAL;
 using BotZeitNot.DAL.Domain.Repositories;
 using BotZeitNot.Domain.Interface;
-using Microsoft.Extensions.Logging;
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
-using User = BotZeitNot.DAL.Domain.Entity.User;
 
 namespace BotZeitNot.BL.TelegramBotService.Commands.List
 {
@@ -18,7 +16,7 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
         public override string Name => "/cancel";
 
 
-        private SubSeriesRepository _subSeriesRepository;
+        private readonly SubSeriesRepository _subSeriesRepository;
         private TelegramBotClient _client;
         private Message _message;
 
@@ -28,13 +26,13 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
         }
 
 
-        public async override Task Execute(Message message, TelegramBotClient client)
+        public override async Task Execute(Message message, TelegramBotClient client)
         {
             _client = client;
             _message = message;
 
 
-            List<string> series = _subSeriesRepository.GetAllSeriesNameByChatId(message.Chat.Id).ToList();
+            var series = _subSeriesRepository.GetAllSeriesNameByChatId(message.Chat.Id).ToList();
 
             if (!IsSubSeriesValid(series).Result)
             {
@@ -47,23 +45,21 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
         }
 
 
-        private async Task<bool> IsSubSeriesValid(List<string> series)
+        private async Task<bool> IsSubSeriesValid(ICollection series)
         {
-            if (series == null || series.Count == 0)
-            {
-                string errorMessage = "У вас еще нет подписок.\n" +
-                                      "Найти и добавить сериалы " +
-                                      "можно с помощью команды /search";
+            if (series != null && series.Count != 0) 
+                return true;
+            const string errorMessage = "У вас еще нет подписок.\n" +
+                                        "Найти и добавить сериалы " +
+                                        "можно с помощью команды /search";
 
-                await _client.SendTextMessageAsync(_message.Chat.Id, errorMessage);
-                return false;
-            }
-            return true;
+            await _client.SendTextMessageAsync(_message.Chat.Id, errorMessage);
+            return false;
         }
 
-        private List<List<InlineKeyboardButton>> MakeInlineKeyboardButtons(List<string> series)
+        private IEnumerable<List<InlineKeyboardButton>> MakeInlineKeyboardButtons(List<string> series)
         {
-            List<InlineKeyboardButton> buttonsList = series.
+            var buttonsList = series.
                 Select(s => new InlineKeyboardButton()
                 {
                     Text = s,
@@ -73,16 +69,15 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
 
 
             var buttonsKeyboard = new List<List<InlineKeyboardButton>>();
-            List<InlineKeyboardButton> localList = new List<InlineKeyboardButton>();
+            var localList = new List<InlineKeyboardButton>();
 
             foreach (var item in buttonsList)
             {
                 localList.Add(item);
-                if (localList.Count == 2)
-                {
-                    buttonsKeyboard.Add(localList);
-                    localList = new List<InlineKeyboardButton>();
-                }
+                if (localList.Count != 2)
+                    continue;
+                buttonsKeyboard.Add(localList);
+                localList = new List<InlineKeyboardButton>();
             }
 
             if(series.Count % 2 != 0)
@@ -105,10 +100,10 @@ namespace BotZeitNot.BL.TelegramBotService.Commands.List
         }
 
 
-        private async Task SendCancelButtons(List<List<InlineKeyboardButton>> buttons)
+        private async Task SendCancelButtons(IEnumerable<List<InlineKeyboardButton>> buttons)
         {
-            string cancelMessage = "Выберите, от рассылки какого " +
-                                   "сериала вы хотите отписаться";
+            const string cancelMessage = "Выберите, от рассылки какого " +
+                                         "сериала вы хотите отписаться";
 
             await _client.SendTextMessageAsync
                 (

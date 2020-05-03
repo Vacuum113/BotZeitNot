@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace BotZeitNot.DAL.Domain.Repositories.SpecificStorage
+namespace BotZeitNot.DAL.Domain.SpecificStorage
 {
     public interface ISubSeriesRepository
     {

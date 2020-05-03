@@ -4,7 +4,7 @@ using BotZeitNot.BL.TelegramBotService.Commands;
 using BotZeitNot.BL.TelegramBotService.TelegramBotConfig;
 using BotZeitNot.DAL;
 using BotZeitNot.DAL.Domain.Repositories;
-using BotZeitNot.DAL.Domain.Repositories.SpecificStorage;
+using BotZeitNot.DAL.Domain.SpecificStorage;
 using BotZeitNot.Domain.Interface;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -29,14 +29,11 @@ namespace BotZeitNot.Api
         {
             var configBot = Configuration.GetSection("BotConfigProps").Get<BotConfigProps>();
 
-            Bot bot = new Bot(configBot.Token);
+            var bot = new Bot(configBot.Token);
 
-            bot.Run("https://" + configBot.IPToWebHooks + "/Update/GetUpdate");
+            bot.Run("https://" + configBot.IpToWebHooks + "/Update/GetUpdate");
 
-            services.AddSingleton(servicesProvider =>
-            {
-                return bot;
-            });
+            services.AddSingleton(servicesProvider => bot);
 
             services.AddScoped<ITelegramBotService, TelegramBotService>();
 

@@ -1,37 +1,31 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.ServiceModel.Syndication;
 using System.Xml;
+using Microsoft.Extensions.Logging;
 
-namespace BotZeitNot.RSS
+namespace BotZeitNot.RSS.RSSWorker
 {
-    public class RSSParserLostFilm
+    public class RssParserLostFilm
     {
-        private readonly ILogger<RSSParserLostFilm> _logger;
+        private readonly ILogger<RssParserLostFilm> _logger;
 
-        public RSSParserLostFilm()
+        public RssParserLostFilm()
         {
             var loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder.AddConsole();
                 builder.AddDebug();
             });
-            _logger = loggerFactory.CreateLogger<RSSParserLostFilm>();
+            _logger = loggerFactory.CreateLogger<RssParserLostFilm>();
         }
 
         public List<Tuple<string, string>> ParseNamesAndLinks(XmlReader xmlReader)
         {
-            SyndicationFeed feed = SyndicationFeed.Load(xmlReader);
+            var feed = SyndicationFeed.Load(xmlReader);
 
-            List<Tuple<string, string>> tuples = new List<Tuple<string, string>>();
-
-            foreach (var item in feed.Items)
-            {
-                tuples.Add(new Tuple<string, string>(item.Title.Text, item.Links[0].Uri.ToString()));
-            }
-
-            return tuples;
+            return feed.Items.Select(item => new Tuple<string, string>(item.Title.Text, item.Links[0].Uri.ToString())).ToList();
         }
     }
 }

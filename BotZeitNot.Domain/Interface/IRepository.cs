@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace BotZeitNot.Domain.Interface
 {
-    public interface IRepository<T, TKey> where T : class, IEntity<TKey>
+    public interface IRepository<T, in TKey> where T : class, IEntity<TKey>
     {
         void Add(T entity);
         void Update(T entity);
